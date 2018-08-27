@@ -1,4 +1,6 @@
-# thunder
+# thunder-chat
+
+`thunder-chat` is simple multi-threaded chatting server.
 
 
 
