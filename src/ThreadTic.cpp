@@ -60,8 +60,8 @@ void ThreadTic::Run()
 
     if (iHealthCnt >= 720)
     {
-      CNPUtil::DeleteFile(pchOldLogDir, 86400 * 2); // old_log dir ������ ��Ʋ ������ �����.
-      CNPUtil::DeleteFile(pchLogDir, 86400 * 2);    // log dir ������ ��Ʋ ������ �����.
+      CNPUtil::DeleteFile(pchOldLogDir, 86400 * 2); // old_log dir
+      CNPUtil::DeleteFile(pchLogDir, 86400 * 2);    // log dir
       iHealthCnt = 1;
     }
 
