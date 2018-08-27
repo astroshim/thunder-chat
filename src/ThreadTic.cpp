@@ -7,7 +7,7 @@
 #include <libgen.h>
 #endif
 
-ThreadTic::ThreadTic(Process* const _pMainProcess)
+ThreadTic::ThreadTic(Process *const _pMainProcess)
 {
   CNPLog::GetInstance().Log("ThreadTic Construct");
   m_pMainProcess = _pMainProcess;
@@ -26,7 +26,7 @@ void ThreadTic::Run()
 
   char pchOldLogDir[PATH_MAX];
   char pchLogDir[PATH_MAX];
-  char * name_start, * name_end;
+  char *name_start, *name_end;
   int size;
 
   // check directory
@@ -41,33 +41,30 @@ void ThreadTic::Run()
   memcpy(pchLogDir, name_start, size);
   pchLogDir[size] = '\0';
 
-  strcat(pchOldLogDir, "old_log");  // jjang file
+  strcat(pchOldLogDir, "old_log"); // jjang file
   // zfile �� old_log�� ������� �ʴ´�.
 
-  while(1)
+  while (1)
   {
 
-// #ifndef _FREEBSD
-//     if(iHealthCnt%12 == 0)  // 
-//     {
-//       m_pMainProcess->HealthCheckUsers();
-//       if(!(m_pMainProcess->GetMRTGURL() == NULL || strncmp(m_pMainProcess->GetMRTGURL(), "no", 2) == 0))
-//       {
-//         m_pMainProcess->SendStorageInfo();
-//       }
-//     }
-// #endif
+    // #ifndef _FREEBSD
+    //     if(iHealthCnt%12 == 0)  //
+    //     {
+    //       m_pMainProcess->HealthCheckUsers();
+    //       if(!(m_pMainProcess->GetMRTGURL() == NULL || strncmp(m_pMainProcess->GetMRTGURL(), "no", 2) == 0))
+    //       {
+    //         m_pMainProcess->SendStorageInfo();
+    //       }
+    //     }
+    // #endif
 
-    if(iHealthCnt >= 720)
+    if (iHealthCnt >= 720)
     {
-      CNPUtil::DeleteFile(pchOldLogDir, 86400*2); // old_log dir ������ ��Ʋ ������ �����.
-      CNPUtil::DeleteFile(pchLogDir, 86400*2);  // log dir ������ ��Ʋ ������ �����.
+      CNPUtil::DeleteFile(pchOldLogDir, 86400 * 2); // old_log dir ������ ��Ʋ ������ �����.
+      CNPUtil::DeleteFile(pchLogDir, 86400 * 2);    // log dir ������ ��Ʋ ������ �����.
       iHealthCnt = 1;
     }
 
-    /**
-     *   �θ����μ����� ��� �ִ��� ����, ������ �׾������!
-     */
     /*
        int status;
     //int wait_pid = waitpid(m_pMainProcess->GetPPid(), &status, WIFEXITED|WIFSIGNALED|WIFSTOPPED|WSTOPSIG|WUNTRACED|WNOHANG);
@@ -94,7 +91,7 @@ void ThreadTic::Run()
       if (errno == ESRCH)
       {
         CNPLog::GetInstance().Log("Parent process killed=(%d)(%s), pid=(%d, %d), status=(%d)",
-            errno, strerror(errno), m_pMainProcess->GetPid(), getpid(), GetStarted());
+                                  errno, strerror(errno), m_pMainProcess->GetPid(), getpid(), GetStarted());
         m_pMainProcess->SetStarted(false);
       }
     }
@@ -105,4 +102,3 @@ void ThreadTic::Run()
 
   pthread_exit(NULL);
 }
-

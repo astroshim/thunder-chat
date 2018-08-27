@@ -36,7 +36,6 @@ OBJS = 	CircularBuff.o		\
 		ThreadAcceptor.o		\
 		ThreadWorker.o		\
 		ThreadReceiver.o	\
-		ThreadSender.o		\
 		BroadcastMessage.o		\
 		ThreadBroadcaster.o		\
 		ThreadTic.o			\
@@ -44,6 +43,8 @@ OBJS = 	CircularBuff.o		\
 		ReleaseSlot.o		\
 		ChatManager.o	\
 		ChatServer.o			
+
+		# ThreadSender.o		\
 
 SRCS      	= $(OBJS:.o=.cpp) 
 

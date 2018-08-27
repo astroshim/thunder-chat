@@ -42,7 +42,6 @@ OBJ_MAIN = MainProcess.o 		\
 		./src/ThreadAcceptor.o     \
 		./src/ThreadWorker.o     \
 		./src/ThreadReceiver.o    \
-		./src/ThreadSender.o      \
 		./src/BroadcastMessage.o      \
 		./src/ThreadBroadcaster.o      \
 		./src/ThreadTic.o       \
@@ -50,6 +49,8 @@ OBJ_MAIN = MainProcess.o 		\
 		./src/ReleaseSlot.o     \
 		./src/ChatManager.o	  \
 		./src/ChatServer.o		
+
+		# ./src/ThreadSender.o      \
 
 SRCS        = $(OBJ_MAIN:.o=.cpp)
 

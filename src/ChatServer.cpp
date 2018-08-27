@@ -17,7 +17,7 @@
 #include "../include/ThreadReceiver.h"
 #include "../include/ThreadBroadcaster.h"
 #include "../include/BroadcastMessage.h"
-#include "../include/ThreadSender.h"
+// #include "../include/ThreadSender.h"
 #include "../include/ThreadTic.h"
 #include "../include/ThreadManager.h"
 #include "../include/ServerInfoDN.h"
@@ -559,12 +559,12 @@ void ChatServer::Run()
   ThreadAcceptor *tAcceptor = new ThreadAcceptor(this);
   ThreadManager::GetInstance()->Spawn(tAcceptor);
 
-  for(int i = 0; i < m_pServerInfo->GetThreadCount(THREAD_SENDER); i++)
-  {
-    Thread *t = new ThreadSender(this);
-    ThreadManager::GetInstance()->Spawn(t);
-    CNPLog::GetInstance().Log("In ChatServer Sender Create (%p,%lu) ", t, t->GetThreadID());
-  }
+  // for(int i = 0; i < m_pServerInfo->GetThreadCount(THREAD_SENDER); i++)
+  // {
+  //   Thread *t = new ThreadSender(this);
+  //   ThreadManager::GetInstance()->Spawn(t);
+  //   CNPLog::GetInstance().Log("In ChatServer Sender Create (%p,%lu) ", t, t->GetThreadID());
+  // }
 
   for(int i = 0; i < m_pServerInfo->GetThreadCount(THREAD_RECEIVER); i++)
   {
