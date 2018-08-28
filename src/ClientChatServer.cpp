@@ -15,16 +15,8 @@ ClientChatServer::~ClientChatServer()
 {
 }
 
-void ClientChatServer::SetSeq(int _seq) { 
-    m_iSeq = _seq;
-}
-
 void ClientChatServer::SetPid(int _pid) { 
     m_iPid = _pid;
-}
-
-const int ClientChatServer::GetSeq() {
-    return m_iSeq;
 }
 
 const int ClientChatServer::GetPid() {
@@ -57,7 +49,6 @@ void ClientChatServer::WorkDSHello(const T_PACKET &_tPacket)
     tPacket.header.command = cmd_HELLO_DSM_DS;
     tPacket.header.length = sizeof(Tcmd_HELLO_DSM_DS);
 
-    // sndbody->iSeq = iSeq;
     sndbody->iMaxUser = iMaxUser;
     sndbody->iPid = pClientBody->iPid;
     // sndbody->iShmKey = iShmKey;

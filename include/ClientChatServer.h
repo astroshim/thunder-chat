@@ -29,9 +29,7 @@ public:
   void MessageBroadcast(const T_PACKET &_tPacket);
   const int ExecuteCommand(Thread *_pThread);
 
-  const int GetSeq();
   const int GetPid();
-  void SetSeq(int _seq);
   void SetPid(int _pid);
 };
 

@@ -85,18 +85,6 @@ void Process::SetSendPipe(const int _iSendPipe)
   m_iPipe[1] = _iSendPipe;
 }
 
-/*
-   void Process::SetSeq(const int _iSeq)
-   {
-   m_iSeq = _iSeq;
-   }
-
-   const int Process::GetSeq()
-   {
-   return m_iSeq;
-   }
-   */
-
 const bool Process::IsAliveProcess(const int _iPid)
 {
   if (kill(_iPid, 0) < 0)
@@ -317,7 +305,6 @@ const bool Process::SpawnProcess(Process *_pProcess, int _iProcessCnt)
 #ifndef _FREEBSD
       setpgrp();
 #endif
-      //_pProcess->SetSeq(i);
       _pProcess->SetPid(getpid());
       _pProcess->Run();
       //this->Run();

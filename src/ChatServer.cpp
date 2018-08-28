@@ -79,16 +79,6 @@ const int ChatServer::GetMaxUser()
   return m_iMaxUser;
 }
 
-const int ChatServer::GetSeq()
-{
-  return m_iSeq;
-}
-
-void ChatServer::SetSeq(const int _iSeq)
-{
-  m_iSeq = _iSeq;
-}
-
 void ChatServer::SetMaxUser(const int _iMaxUser)
 {
   m_iMaxUser = _iMaxUser;

@@ -531,7 +531,7 @@ void CNPUtil::DeleteFile(const char* const _pchDirName, const unsigned long _uiT
   //rmdir(_pchDirName);
 }
 
-int  CNPUtil::GetByteOrder(void)
+int CNPUtil::GetByteOrder(void)
 {
   union {
     short i2;

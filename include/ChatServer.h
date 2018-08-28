@@ -53,6 +53,7 @@ class ChatServer : public Process
 
     int m_iSeq;
     int m_iMaxUser;
+    char uniqId[32];
 
   public:
     ChatServer();
@@ -67,10 +68,7 @@ class ChatServer : public Process
     ClientSocket *const NegotiationWithManager(string server, int port);
 
     const int GetMaxUser();
-    const int GetSeq();
-
     void SetMaxUser(const int _iMaxUser);
-    void SetSeq(const int _iSeq);
 
     const char *const GetIPAddr();
     const int GetCurrentUserCount();
@@ -103,6 +101,8 @@ class ChatServer : public Process
 
     const char *const GetVolName();
     const char *const GetDirName();
+
+    const char *const GetUniqId();
 
     const uint64_t GetDownloadSize(const uint32_t _nBillNo);
 

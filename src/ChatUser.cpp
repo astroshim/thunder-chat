@@ -9,6 +9,8 @@ ChatUser::ChatUser()
   memset((char *)&m_tSendPacket, 0x00, sizeof(T_PACKET));
   m_eSendMode = SEND_ONLY_FILE;
   pthread_mutex_init(&m_mtLst, NULL);
+
+  // CNPUtil::GetUnixTimeStr()
 }
 
 ChatUser::ChatUser(Socket *const _cSocket)

@@ -49,10 +49,7 @@ class Process
     void SetSendPipe(const int _iSendPipe);
 
     const bool IsAliveProcess(const int _iPid);
-    /*
-       void SetSeq(const int _iSeq);
-       const int GetSeq();
-     */
+
   private:
     //pid_t m_lstChildPid[MAX_PROCESS_CNT];
 
