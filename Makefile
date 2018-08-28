@@ -46,7 +46,6 @@ OBJ_MAIN = MainProcess.o 		\
 		./src/ThreadBroadcaster.o      \
 		./src/ThreadTic.o       \
 		./src/CircularQueue.o     \
-		./src/ReleaseSlot.o     \
 		./src/ChatManager.o	  \
 		./src/ChatServer.o		
 

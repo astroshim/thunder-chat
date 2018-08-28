@@ -166,11 +166,11 @@ typedef struct
 // hello DSM -> DS
 typedef struct
 {
-  uint32_t iSeq;
+  // uint32_t iSeq;
   uint32_t iPid;
   uint32_t iMaxUser;
-  uint32_t iShmKey;
-  uint32_t iShmDSStatus;
+  // uint32_t iShmKey;
+  // uint32_t iShmDSStatus;
   double   dHelloTime;
 }Tcmd_HELLO_DSM_DS;
 

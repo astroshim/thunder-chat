@@ -26,9 +26,6 @@
 #include <netinet/ether.h> // for linux
 #endif
 
-
-
-
 #include <pthread.h>
 
 typedef unsigned char UCHAR;

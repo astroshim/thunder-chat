@@ -18,8 +18,6 @@ class ServerInfoDN;
 class CircularQueue;
 class BroadcastMessage;
 
-class ReleaseSlot;
-
 using namespace std;
 #include <iostream>
 #include <sstream>
@@ -35,14 +33,8 @@ class ChatServer : public Process
      * ChatServer Server Infomation
      */
     ServerInfoDN *m_pServerInfo;
-
     int m_iConnCount;
-
     Client *m_pDNServerSocket; //
-
-    TStatistics *m_pShmKcps;
-    TDSStatus *m_pShmDSStatus; // for DS Status
-    int *m_pShmD;
 
 #ifdef _FREEBSD
     IOMP_KQUEUE *m_pIOMP;
@@ -61,9 +53,6 @@ class ChatServer : public Process
 
     int m_iSeq;
     int m_iMaxUser;
-    int m_iShmKey;      // key from dsm
-    int m_iShmDSStatus; // key from dsm
-    ReleaseSlot *m_pSlot;
 
   public:
     ChatServer();
@@ -72,18 +61,15 @@ class ChatServer : public Process
 
     void Run();
     Client *const GetServerSocket();
-    const char *const GetMRTGURL();
     const char *const GetLogFileName();
 
     const int ConnectToMgr();
     ClientSocket *const NegotiationWithManager(string server, int port);
 
     const int GetMaxUser();
-    const int GetShmKey();
     const int GetSeq();
 
     void SetMaxUser(const int _iMaxUser);
-    void SetShmKey(const int _iShmKey);
     void SetSeq(const int _iSeq);
 
     const char *const GetIPAddr();
@@ -121,8 +107,6 @@ class ChatServer : public Process
     const uint64_t GetDownloadSize(const uint32_t _nBillNo);
 
     const unsigned int GetBandwidth(const char _chID);
-    void SetD();
-
     void MessageBroadcast(BroadcastMessage *_message);
     void MessageBroadcastToManagers(BroadcastMessage *_message);
 };

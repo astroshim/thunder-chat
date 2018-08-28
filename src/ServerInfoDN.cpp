@@ -5,9 +5,6 @@
 
 ServerInfoDN::ServerInfoDN()
   : m_iMaxUser(0)
-    , m_iShmKey(0)
-    //, m_iMgrServerPort(0)
-    //, m_iMessageQ(0)
 {
   memset(m_pchIPAddr, 0x00, sizeof(char)*MAX_IP_LEN);
   memset(m_pchMRTGURL, 0x00, sizeof(char)*MAX_URL);
@@ -110,11 +107,6 @@ ServerInfoDN::ServerInfoDN(Properties &_cProperties)
   if(_cProperties.GetProperty("DIRECTORY_NAME") != "")
   {
     strncpy(m_pchDirName, _cProperties.GetProperty("DIRECTORY_NAME").c_str(), MAX_DIRNAME);
-  }
-
-  if(_cProperties.GetProperty("SHMKEY") != "")
-  {
-    m_iShmKey   = atoi(_cProperties.GetProperty("SHMKEY").c_str());
   }
 
   /*
@@ -246,13 +238,6 @@ const unsigned int ServerInfoDN::DefineBandwidth(char* const _pchBand)
   return iBandwidth;
 }
 
-
-const int ServerInfoDN::GetShmKey()
-{
-  return m_iShmKey;
-}
-
-
 const int ServerInfoDN::GetMaxUser()
 {
   return m_iMaxUser;
@@ -271,11 +256,6 @@ const char* const ServerInfoDN::GetLogFileName()
 const char* const ServerInfoDN::GetIPAddr()
 {
   return m_pchIPAddr;
-}
-
-const char* const ServerInfoDN::GetMRTGURL()
-{
-  return m_pchMRTGURL;
 }
 
 const char* const ServerInfoDN::GetVolName()

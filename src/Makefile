@@ -40,7 +40,6 @@ OBJS = 	CircularBuff.o		\
 		ThreadBroadcaster.o		\
 		ThreadTic.o			\
 		CircularQueue.o		\
-		ReleaseSlot.o		\
 		ChatManager.o	\
 		ChatServer.o			
 

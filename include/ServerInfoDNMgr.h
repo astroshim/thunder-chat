@@ -25,8 +25,6 @@ class ServerInfoDNMgr
     int   m_iDSMaxUser;         // max connection user
     int   m_iDNPort;          //
     int   m_iDNCnt;         //
-    int   m_iShmKey;          //
-    int   m_iShmDSStatus;         //
     char  m_pchIPAddr[MAX_IP_LEN];    // ip addr
     char  m_pchLogFile[LOG_FILE_LEN]; // log filename length
 
@@ -42,13 +40,7 @@ class ServerInfoDNMgr
     const char* const GetLogFileName();
     const char* const GetIPAddr();
 
-    const char* const GetMRTGURL();
     const int GetDNCnt();
-    const int GetShmKey();
-    const int GetShmDSStatus();
-    //  const int GetMessageQID();
-    //  const char* const GetUnixSockPath();
-
     const serverInfoMap&    GetPortMap();
     const int GetPort(const ENUM_SERVERSOCKET_TYPE _type);  
     const int GetThreadCount(const ENUM_THREAD_TYPE _type);

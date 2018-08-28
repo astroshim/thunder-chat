@@ -5,13 +5,13 @@
 #include "../include/ThreadManager.h"
 
 Client::Client()
-    : m_cSocket(NULL), m_iUserSeq(-1), m_iState(STATE_CLOSED), m_eType(CLIENT_NOTHING), m_pMainProcess(NULL)
+    : m_cSocket(NULL), m_iState(STATE_CLOSED), m_eType(CLIENT_NOTHING), m_pMainProcess(NULL)
 {
   SetAccessTime();
 }
 
 Client::Client(Socket *const _cSocket, const ENUM_CLIENT_TYPE _eType)
-    : m_cSocket(_cSocket), m_iUserSeq(-1), m_iState(STATE_WAIT), m_eType(_eType), m_pMainProcess(NULL)
+    : m_cSocket(_cSocket), m_iState(STATE_WAIT), m_eType(_eType), m_pMainProcess(NULL)
 {
   SetAccessTime();
 }
@@ -105,16 +105,6 @@ const ENUM_CLIENT_TYPE Client::GetType()
 void Client::SetType(const ENUM_CLIENT_TYPE _eType)
 {
   m_eType = _eType;
-}
-
-const int Client::GetUserSeq()
-{
-  return m_iUserSeq;
-}
-
-void Client::SetUserSeq(int _iUserSeq)
-{
-  m_iUserSeq = _iUserSeq;
 }
 
 void Client::SetAccessTime()

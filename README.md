@@ -22,11 +22,8 @@ add `-D_FREEBSD` from Makefile
 ### prerequisite
 
 ```
-yum install gcc
-yum install gcc-c++
-yum install curl-devel
-yum install openssl-devel
-touch /usr/include/stropts.h
+sudo yum install -y gcc gcc-c++ curl-devel openssl-devel
+sudo touch /usr/include/stropts.h
 ```
 
 ### compile

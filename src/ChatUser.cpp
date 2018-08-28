@@ -68,8 +68,6 @@ void ChatUser::SendPacket(const T_PACKET *_pPacket)
   pthread_mutex_unlock(&m_mtLst);
 #else
   // response directly
-  //if(((Socket *)(GetSocket()))->Write((char *)_pPacket, PDUHEADERSIZE+_pPacket->header.length) < 0)
-  //if(static_cast<Socket*>(GetSocket())->Write((char *)_pPacket, PDUHEADERSIZE+_pPacket->header.length) < 0)
   if (GetSocket()->Write((char *)_pPacket, PDUHEADERSIZE + _pPacket->header.length) < 0)
   {
     CNPLog::GetInstance().Log("In ChatUser Write Error (%p)", this);
@@ -78,26 +76,6 @@ void ChatUser::SendPacket(const T_PACKET *_pPacket)
 #endif
 }
 
-// void ChatUser::SendCloseToMgr()
-// {
-//   // send to Mgr close info
-//   T_PACKET tSendPacket;
-//   Tcmd_USER_CLOSE_DS_DSM *sndbody = (Tcmd_USER_CLOSE_DS_DSM *)tSendPacket.data;
-//   tSendPacket.header.command  = cmd_USER_CLOSE_DS_DSM;
-//   tSendPacket.header.length   = sizeof(Tcmd_USER_CLOSE_DS_DSM);
-
-//   ChatServer *chatServer = NULL;
-//   if((chatServer = dynamic_cast<ChatServer*>(m_pMainProcess)))
-//   {
-//     chatServer->GetSendPipeClient()->Write((char *)&tSendPacket,
-//         PDUHEADERSIZE + tSendPacket.header.length);
-//   }
-//   else
-//   {
-//     CNPLog::GetInstance().Log("Work SendCloseToMgr(%p) chatServer is NULL!! ", this);
-//   }
-// }
-
 void ChatUser::WorkHello(const T_PACKET &_tPacket)
 {
   Tcmd_HELLO_DC_DS *pClientBody = (Tcmd_HELLO_DC_DS *)_tPacket.data;
@@ -105,18 +83,6 @@ void ChatUser::WorkHello(const T_PACKET &_tPacket)
   memset((char *)&m_tSendPacket, 0x00, sizeof(T_PACKET));
   m_tSendPacket.header.command = cmd_HELLO_DS_DC;
   m_tSendPacket.header.length = 0;
-
-  // m_tFileInfo.nComCode = pClientBody->iComCode;
-
-  if (pClientBody->iComCode == D_D)
-  {
-    ChatServer *pServer = NULL;
-    if ((pServer = dynamic_cast<ChatServer *>(m_pMainProcess)))
-    {
-      pServer->SetD();
-      //m_pMainProcess->SetSignalNo(D_D);
-    }
-  }
 
   ChatServer *pServer = NULL;
   if ((pServer = dynamic_cast<ChatServer *>(m_pMainProcess)))
@@ -151,8 +117,6 @@ void ChatUser::WorkGoodBye(const T_PACKET &_tPacket)
   m_tSendPacket.header.length = 0;
 
   CNPLog::GetInstance().Log("ChatUser::WorkGoodBye(%p)", this);
-  //if(((Socket *)(GetSocket()))->Write((char *)&m_tSendPacket, PDUHEADERSIZE+m_tSendPacket.header.length) < 0)
-  //if(static_cast<Socket*>(GetSocket())->Write((char *)&m_tSendPacket, PDUHEADERSIZE+m_tSendPacket.header.length) < 0)
   if (GetSocket()->Write((char *)&m_tSendPacket, PDUHEADERSIZE + m_tSendPacket.header.length) < 0)
   {
     CNPLog::GetInstance().Log("In ChatUser Write Error (%p)", this);

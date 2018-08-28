@@ -8,9 +8,6 @@ ServerInfoDNMgr::ServerInfoDNMgr()
         , m_iDSMaxUser(0)
         , m_iDNPort(0)
         , m_iDNCnt(1)
-        , m_iShmKey(0)
-        , m_iShmDSStatus(0)
-        //, m_iMessageQ(0)
 {
   memset(m_pchIPAddr, 0x00, sizeof(char)*MAX_IP_LEN);
   memset(m_pchMRTGURL, 0x00, sizeof(char)*MAX_URL);
@@ -63,22 +60,10 @@ ServerInfoDNMgr::ServerInfoDNMgr(Properties &_cProperties)
     m_iDSMaxUser = atoi(_cProperties.GetProperty("DS_MAX_USER").c_str());
   }
 
-
   if(_cProperties.GetProperty("DN_CNT") != "")
   {
     m_iDNCnt  = atoi(_cProperties.GetProperty("DN_CNT").c_str());
   }
-
-  if(_cProperties.GetProperty("SHMKEY") != "")
-  {
-    m_iShmKey   = atoi(_cProperties.GetProperty("SHMKEY").c_str());
-  }
-
-  if(_cProperties.GetProperty("SHM_DS_STATUS") != "")
-  {
-    m_iShmDSStatus  = atoi(_cProperties.GetProperty("SHM_DS_STATUS").c_str());
-  }
-
 
   // log file
   memset(m_pchLogFile, 0x00, sizeof(char)*LOG_FILE_LEN);
@@ -102,19 +87,6 @@ ServerInfoDNMgr::ServerInfoDNMgr(Properties &_cProperties)
     strncpy(m_pchMRTGURL, _cProperties.GetProperty("MRTG_URL").c_str(), MAX_URL);
   }
 
-/*
-    if(_cProperties.GetProperty("MESSAGEQ_ID") != "")
-    {
-        m_iMessageQ = atoi(_cProperties.GetProperty("MESSAGEQ_ID").c_str());
-    }
-*/
-
-/*
-  if(_cProperties.GetProperty("UNIX_SOCK_PATH") != "")
-  {
-    strcpy(m_pchUnixSockPath, _cProperties.GetProperty("UNIX_SOCK_PATH").c_str());
-  }
-*/
 }
 
 const int ServerInfoDNMgr::GetMaxUser()
@@ -142,37 +114,9 @@ const char* const ServerInfoDNMgr::GetIPAddr()
     return m_pchIPAddr;
 }
 
-const char* const ServerInfoDNMgr::GetMRTGURL()
-{
-    return m_pchMRTGURL;
-}
-
-/*
-const char* const ServerInfoDNMgr::GetUnixSockPath()
-{
-    return m_pchUnixSockPath;
-}
-*/
-
-/*
-const int ServerInfoDNMgr::GetMessageQID()
-{
-    return m_iMessageQ;
-}
-*/
 const int ServerInfoDNMgr::GetDNCnt()
 {
     return m_iDNCnt;
-}
-
-const int ServerInfoDNMgr::GetShmKey()
-{
-    return m_iShmKey;
-}
-
-const int ServerInfoDNMgr::GetShmDSStatus()
-{
-    return m_iShmDSStatus;
 }
 
 const serverInfoMap& ServerInfoDNMgr::GetPortMap()

@@ -25,7 +25,8 @@ void BroadcastMessage::SetMessage(char *_message)
 void BroadcastMessage::SetMessage(char *_message, int _size)
 {
   memcpy(message, _message, _size);
-  message[strcspn(message, "\r\n")] = 0;
+  message[_size-1] = 0;
+  // message[strcspn(message, "\r\n")] = 0;
 }
 
 const char* BroadcastMessage::GetMessage()

@@ -27,24 +27,17 @@
 #include "../include/ChatUser.h"
 #include "../include/MessageQ.h"
 #include "../include/SharedMemory.h"
-#include "../include/ReleaseSlot.h"
 
 ChatServer::ChatServer()
   :m_pServerInfo(NULL)
   ,m_iConnCount(0)
   ,m_pDNServerSocket(NULL)
-  ,m_pShmKcps(NULL)
-  ,m_pShmDSStatus(NULL)
-  ,m_pShmD(NULL)
   ,m_pIOMP(NULL)
   ,m_pReceiveQueue(NULL)
   ,m_pSendQueue(NULL)
   ,m_pBroadcastQueue(NULL)
   ,m_iSeq(-1)
   ,m_iMaxUser(0)
-  ,m_iShmKey(0)
-  ,m_iShmDSStatus(0)
-   ,m_pSlot(NULL)
 {
   this->SetStarted(false);
   pthread_mutex_init(&m_lockClient, NULL);
@@ -53,18 +46,12 @@ ChatServer::ChatServer()
 ChatServer::ChatServer(Properties& _cProperties)
   :m_iConnCount(0)
   ,m_pDNServerSocket(NULL)
-  ,m_pShmKcps(NULL)
-  ,m_pShmDSStatus(NULL)
-  ,m_pShmD(NULL)
   ,m_pIOMP(NULL)
   ,m_pReceiveQueue(new CircularQueue())
   ,m_pSendQueue(new CircularQueue())
   ,m_pBroadcastQueue(new CircularQueue())
   ,m_iSeq(-1)
   ,m_iMaxUser(0)
-  ,m_iShmKey(0)
-  ,m_iShmDSStatus(0)
-   ,m_pSlot(NULL)
 {
   this->SetStarted(false);
   pthread_mutex_init(&m_lockClient, NULL);
@@ -80,10 +67,6 @@ ChatServer::~ChatServer()
   delete m_pSendQueue;
   delete m_pBroadcastQueue;
   delete m_pDNServerSocket;
-  delete m_pShmKcps;
-  delete m_pShmDSStatus;
-  delete m_pShmD;
-  delete m_pSlot;
 }
 
 const int ChatServer::GetCurrentUserCount()
@@ -94,11 +77,6 @@ const int ChatServer::GetCurrentUserCount()
 const int ChatServer::GetMaxUser()
 {
   return m_iMaxUser;
-}
-
-const int ChatServer::GetShmKey()
-{
-  return m_iShmKey;
 }
 
 const int ChatServer::GetSeq()
@@ -114,11 +92,6 @@ void ChatServer::SetSeq(const int _iSeq)
 void ChatServer::SetMaxUser(const int _iMaxUser)
 {
   m_iMaxUser = _iMaxUser;
-}
-
-void ChatServer::SetShmKey(const int _iShmKey)
-{
-  m_iShmKey = _iShmKey;
 }
 
 const char* const ChatServer::GetIPAddr()
@@ -154,11 +127,6 @@ void ChatServer::PutBroadcastQueue(BroadcastMessage *message, Client *const _pCl
 const void* const ChatServer::GetBroadcastQueue()
 {
   return m_pBroadcastQueue->DeQueue();
-}
-
-const char* const ChatServer::GetMRTGURL()
-{
-  return m_pServerInfo->GetMRTGURL();
 }
 
 const int ChatServer::GetServerPort()
@@ -263,24 +231,16 @@ ClientSocket* const ChatServer::NegotiationWithManager(string server, int port)
   }
 
   Tcmd_HELLO_DSM_DS *pRcvBody = (Tcmd_HELLO_DSM_DS *)tHelloPacket.data;
-  CNPLog::GetInstance().Log("In ConnectToMgr:: Hello Recv seq=(%d), shmKey=(%d), maxUser=(%d)",
-      pRcvBody->iSeq, pRcvBody->iShmKey, pRcvBody->iMaxUser);
 
-  SetSeq(pRcvBody->iSeq);
-
-  SetShmKey(pRcvBody->iShmKey);
-  m_iShmDSStatus = pRcvBody->iShmDSStatus;
+  CNPLog::GetInstance().Log("pRcvBody->iPid = (%d)", pRcvBody->iPid); 
+  CNPLog::GetInstance().Log("pRcvBody->iMaxUser = (%d)", pRcvBody->iMaxUser); 
+  CNPLog::GetInstance().Log("pRcvBody->dHelloTime = (%d)", pRcvBody->dHelloTime); 
   SetMaxUser(pRcvBody->iMaxUser);
   return pCSocket;
 }
 
 void ChatServer::HealthCheckUsers()
 {
-  if(*m_pShmD == D_D)
-  {
-    SetStarted(false);
-  }
-
   pthread_mutex_lock(&m_lockClient);
   std::list<Client*>::iterator iter = m_lstClient.begin();
   while( iter != m_lstClient.end() )
@@ -301,7 +261,6 @@ void ChatServer::HealthCheckUsers()
           CNPUtil::GetMicroTime()-pClient->GetAccessTime());
 
       iter = m_lstClient.erase( iter );
-      m_pSlot->PutSlot(pClient->GetUserSeq());
 
       delete pClient;
       m_iConnCount--;
@@ -345,29 +304,18 @@ void ChatServer::AcceptClient(Socket* const _pClientSocket, ENUM_CLIENT_TYPE typ
 {
   m_iConnCount++;
   pthread_mutex_lock(&m_lockClient);
-  int iSlot = m_pSlot->GetFreeSlot();
-  if(iSlot < 0)
-  {
-    CNPLog::GetInstance().Log("Accept Client SlotOverFlow ClientSocket=(%p)", _pClientSocket);
-    delete _pClientSocket;
-    pthread_mutex_unlock(&m_lockClient);
-    return;
-  }
-
   Client *pNewClient;
   pNewClient = new ChatUser(_pClientSocket);
   pNewClient->SetType(type);
   pNewClient->SetMainProcess(this);
 
   CNPLog::GetInstance().Log("1.NewClient Client=(%p), ClientSocket=(%p)", pNewClient, _pClientSocket);
-  pNewClient->SetUserSeq(iSlot);
   m_lstClient.push_back((Client *)pNewClient);
 
-  CNPLog::GetInstance().Log("NewClient(%p) ClientSocket=(%p), FD=(%d), slot=(%d) ",
+  CNPLog::GetInstance().Log("NewClient(%p) ClientSocket=(%p), FD=(%d) ",
       pNewClient,
       _pClientSocket,
-      pNewClient->GetSocket()->GetFd(),
-      pNewClient->GetUserSeq());
+      pNewClient->GetSocket()->GetFd());
   pthread_mutex_unlock(&m_lockClient);
 
 #ifndef _ONESHOT
@@ -401,9 +349,7 @@ void ChatServer::CloseClient(Client* const _pClient)
   }
 
   pthread_mutex_lock(&m_lockClient);
-  int iSlot = _pClient->GetUserSeq();
   m_lstClient.remove(_pClient);
-  m_pSlot->PutSlot(iSlot);
   delete _pClient;
   pthread_mutex_unlock(&m_lockClient);
   m_iConnCount--;
@@ -481,11 +427,6 @@ void ChatServer::MessageBroadcast(BroadcastMessage *_message)
   // pthread_mutex_unlock(&m_lockClient);
 }
 
-void ChatServer::SetD()
-{
-  (*m_pShmD) = D_D;
-}
-
 void ChatServer::Run()
 {
   this->SetStarted(true);
@@ -516,55 +457,8 @@ void ChatServer::Run()
   CNPLog::GetInstance().Log("SERVER_PORT_DNMGR = (%d)", m_pServerInfo->GetPort(SERVER_PORT_MGR));
   CNPLog::GetInstance().Log("SERVER_PORT = (%d)", m_pServerInfo->GetPort(SERVER_PORT));
 
-  // create release slot
-  m_pSlot = new ReleaseSlot(GetMaxUser());
-
-  // attach shm where ds status
-  SharedMemory smDSStatus((key_t)m_iShmDSStatus, sizeof(struct TDSStatus));
-  m_pShmDSStatus = (struct TDSStatus *)smDSStatus.GetDataPoint();
-  m_pShmDSStatus = &(m_pShmDSStatus[GetSeq()]);
-
-  SharedMemory smD((key_t)188891, sizeof(int));
-  if(!smD.IsStarted())
-  {
-    return ;
-  }
-  m_pShmD = (int *)smD.GetDataPoint();
-  if(m_pShmD == NULL)
-  {
-    printf("smKcps is NULL \n");
-    return;
-  }
-
-  // for statistics 20090527
-  SharedMemory smKcps((key_t)m_pServerInfo->GetShmKey(), sizeof(TStatistics)*MAX_COMPANY);
-  if(!smKcps.IsStarted())
-  {
-    printf("smKcps SharedMemory \n");
-
-    // 2. destroy
-    SharedMemory smKcps((key_t)m_pServerInfo->GetShmKey());
-    smKcps.Destroy();
-    return ;
-  }
-
-  m_pShmKcps = (TStatistics *)smKcps.GetDataPoint();
-  if(m_pShmKcps == NULL)
-  {
-    printf("smKcps is NULL \n");
-    return;
-  }
-  memset(m_pShmKcps, 0, sizeof(TStatistics)*MAX_COMPANY);
-
   ThreadAcceptor *tAcceptor = new ThreadAcceptor(this);
   ThreadManager::GetInstance()->Spawn(tAcceptor);
-
-  // for(int i = 0; i < m_pServerInfo->GetThreadCount(THREAD_SENDER); i++)
-  // {
-  //   Thread *t = new ThreadSender(this);
-  //   ThreadManager::GetInstance()->Spawn(t);
-  //   CNPLog::GetInstance().Log("In ChatServer Sender Create (%p,%lu) ", t, t->GetThreadID());
-  // }
 
   for(int i = 0; i < m_pServerInfo->GetThreadCount(THREAD_RECEIVER); i++)
   {
@@ -583,11 +477,11 @@ void ChatServer::Run()
   // ThreadTic *tTic = new ThreadTic(this);
   // ThreadManager::GetInstance()->Spawn(tTic);
 
-  m_pShmDSStatus->status = ON;
-  CNPLog::GetInstance().Log("In ChatServer Status pid=(%d), seq=(%d), status=(%d)",
-      m_pShmDSStatus->pid
-      ,m_pShmDSStatus->seq
-      ,m_pShmDSStatus->status);
+  // m_pShmDSStatus->status = ON;
+  // CNPLog::GetInstance().Log("In ChatServer Status pid=(%d), seq=(%d), status=(%d)",
+  //     m_pShmDSStatus->pid
+  //     ,m_pShmDSStatus->seq
+  //     ,m_pShmDSStatus->status);
 
   RegisterManager();
 

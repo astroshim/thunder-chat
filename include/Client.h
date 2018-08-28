@@ -19,7 +19,6 @@ class Client
   private:
     Socket        *m_cSocket; 
 
-    int         m_iUserSeq;
     unsigned char   m_iState;
     ENUM_CLIENT_TYPE  m_eType;
 
@@ -94,9 +93,6 @@ class Client
     // 
     //  virtual int   IsValidPacket();
     const int   IsValidPacket();
-
-    void    SetUserSeq(const int _iSeq);
-    const int   GetUserSeq();
 };
 
 #endif

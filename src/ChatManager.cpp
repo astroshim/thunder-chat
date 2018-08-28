@@ -37,9 +37,6 @@ ChatManager::ChatManager()
   ,m_iIPAddr(0)
   ,m_pServerInfo(NULL)
   ,m_pWorkQueue(NULL)
-  ,m_ChatServerInfo(NULL)
-  // ,m_pShm(NULL)
-   ,m_pShmDSStatus(NULL)
 {
   this->SetStarted(false);
   pthread_mutex_init(&m_lockClient, NULL);
@@ -53,48 +50,25 @@ ChatManager::ChatManager(Properties& _cProperties)
   ,m_iMacAddr(0)
   ,m_iIPAddr(0)
   ,m_pWorkQueue(new CircularQueue())
-  ,m_ChatServerInfo(NULL)
-  // ,m_pShm(NULL)
-   ,m_pShmDSStatus(NULL)
 {
   this->SetStarted(false);
   pthread_mutex_init(&m_lockClient, NULL);
-  //pthread_mutex_init(&m_lockShm, NULL);
   pthread_mutex_init(&m_lockClosed, NULL);
   m_pServerInfo = new ServerInfoDNMgr(_cProperties);
   m_pchStatistics = new char[MAX_STATISTICS];
-  //    CNPLog::GetInstance().Log("================ Create ChatManager =====================");
 }
 
 ChatManager::~ChatManager()
 {
   this->SetStarted(false);
-  //  DeleteAllMember();
   delete m_pIOMP;
   delete m_pServerInfo;
   delete m_pWorkQueue;
-  //  delete m_pRecvPipe;
-  //  delete m_pSlot;
-  delete m_ChatServerInfo;
-  // delete m_pShm;
-  delete m_pShmDSStatus;
-  //  delete m_pMQ;
   delete [] m_pchStatistics;
 }
 
 const int ChatManager::GetCurrentUserCount()
 {
-  /*
-     return m_mapConnectList.size();
-
-
-     int iCnt;
-     pthread_mutex_lock(&m_lockClient);
-     iCnt = m_lstChatServer.size();
-     pthread_mutex_unlock(&m_lockClient);
-
-     return iCnt;
-     */
   return m_iConnCount;
 }
 
@@ -106,11 +80,6 @@ const int ChatManager::GetMaxUser()
 const char* const ChatManager::GetIPAddr()
 {
   return m_pServerInfo->GetIPAddr();
-}
-
-const char* const ChatManager::GetMRTGURL()
-{
-  return m_pServerInfo->GetMRTGURL();
 }
 
 const int ChatManager::GetDNServerPort()
@@ -253,32 +222,6 @@ void ChatManager::PutClosedList(Tcmd_USER_CLOSE_DS_DSM* const _pClosedInfo)
   pthread_mutex_unlock(&m_lockClosed);
 }
 
-const uint64_t ChatManager::GetClientDownloadSize(uint32_t _iComCode, uint32_t _iBillno)
-{
-  uint64_t iRet = 0;
-
-  pthread_mutex_lock(&m_lockClosed);
-
-  std::list<Tcmd_USER_CLOSE_DS_DSM*>::iterator iter = m_lstClosed.begin();
-  while( iter != m_lstClosed.end() )
-  {
-    Tcmd_USER_CLOSE_DS_DSM *pClosedInfo = static_cast<Tcmd_USER_CLOSE_DS_DSM *>(*iter);
-
-    if(pClosedInfo->nComCode == _iComCode &&
-        pClosedInfo->nBillNo == _iBillno)
-    {
-      iter = m_lstClosed.erase( iter );
-      iRet += pClosedInfo->nDownSize;
-      delete pClosedInfo;
-    }
-
-    iter++;
-  }
-
-  pthread_mutex_unlock(&m_lockClosed);
-  return iRet;
-}
-
 void ChatManager::HealthCheckClosedList()
 {
 
@@ -291,7 +234,6 @@ void ChatManager::HealthCheckClosedList()
     Tcmd_USER_CLOSE_DS_DSM *pClosedInfo = static_cast<Tcmd_USER_CLOSE_DS_DSM *>(*iter);
 
     double dNow = CNPUtil::GetMicroTime();
-    //if((CNPUtil::GetMicroTime() - pClosedInfo->dClosedTime) > TIME_ALIVE)
     if((dNow - pClosedInfo->dClosedTime) > TIME_ALIVE)
     {
       CNPLog::GetInstance().Log("ChatManager::HealthCheckClosedList(%p) Kill \
@@ -380,83 +322,14 @@ void ChatManager::CloseClient(Client* const _pClient)
   // because of SetState() is on a collision with HealthCheck
   _pClient->SetState(STATE_CLOSED);
 
-  if(_pClient->GetType() == CLIENT_CHAT_SERVER)
-  {
-    memset(&(m_ChatServerInfo[_pClient->GetUserSeq()]), 0, sizeof(Tcmd_HELLO_DSM_DS));
-  }
-
   delete _pClient;
 
   m_iConnCount--;
-
-  //  CloseQueue::GetInstance().EnQueue(_pClient);
 }
 
-void ChatManager::SettingDS(const int _iPos, int* const _piSeq, int* const _piMaxUser, int* const _piShmKey, int* const
-    _piShmDSStatus, int _iPid)
+const int ChatManager::SetDS(int* const _piMaxUser, int* const _piShmKey, int* const _piShmDSStatus)
 {
-  m_ChatServerInfo[_iPos].iSeq     = _iPos;
-  m_ChatServerInfo[_iPos].iPid     = _iPid;
-  m_ChatServerInfo[_iPos].iMaxUser   = m_pServerInfo->GetDSMaxUser();
-  m_ChatServerInfo[_iPos].iShmKey  = m_pServerInfo->GetShmKey();
-  m_ChatServerInfo[_iPos].dHelloTime = CNPUtil::GetMicroTime();
-
-  *_piSeq     = _iPos;
   *_piMaxUser   = m_pServerInfo->GetDSMaxUser();
-  *_piShmKey    = m_pServerInfo->GetShmKey();
-  *_piShmDSStatus = m_pServerInfo->GetShmDSStatus();
-
-  // DS 에서 Hello 가 오면, pid, pos 를 세팅하고, DS status를 OFF 로 세팅한다.
-  // DS 에서 thread 까지 생성이 끝날때, status 를 ON 한다.
-  m_pShmDSStatus[_iPos].pid = _iPid;
-  m_pShmDSStatus[_iPos].seq = _iPos;
-  m_pShmDSStatus[_iPos].status = OFF;
-
-  CNPLog::GetInstance().Log("Setting DS pid=(%d), seq=(%d), status=(%d)",
-      m_pShmDSStatus[_iPos].pid
-      ,m_pShmDSStatus[_iPos].seq
-      ,m_pShmDSStatus[_iPos].status );
-}
-
-const int ChatManager::SetDS(int* const _piSeq, int* const _piMaxUser, int* const _piShmKey, int* const _piShmDSStatus, int _iPid)
-{
-  int i = 0;
-  for(i = 0; i < m_pServerInfo->GetDNCnt(); i++)
-  {
-    if( m_ChatServerInfo[i].iPid <= 0)
-    {
-      SettingDS(i, _piSeq,_piMaxUser,_piShmKey, _piShmDSStatus, _iPid);
-      break;
-    }
-    else
-    {
-      if(!IsAliveProcess(m_ChatServerInfo[i].iPid))
-      {
-        CNPLog::GetInstance().Log("SetDS slot(%d) (%d)=>(%d)", i, m_ChatServerInfo[i].iPid, _iPid);
-
-#if 0
-        CNPLog::GetInstance().Log("죽은 프로세스 이므로 다시 할당된다.slot(%d) (%d)=>(%d)",
-                    i, m_ChatServerInfo[i].iPid, _iPid);
-#endif
-
-        SettingDS(i, _piSeq,_piMaxUser,_piShmKey, _piShmDSStatus, _iPid);
-        break;
-      }
-    }
-  }
-
-  if(i == m_pServerInfo->GetDNCnt())
-  {
-    return -1;
-  }
-
-/*
-  for(i = 0; i < m_pServerInfo->GetDNCnt(); i++)
-  {
-    CNPLog::GetInstance().Log("DS 현황.slot(%d) (%d),(%d)", i, m_ChatServerInfo[i].iPid, _iPid);
-  }
-*/
-
   return 0;
 }
 
@@ -465,17 +338,6 @@ const int ChatManager::MessageBroadcast(const T_PACKET &_tPacket)
   Tcmd_CHAT_DS_DSM *pChatPacket = (Tcmd_CHAT_DS_DSM *)_tPacket.data;
   CNPLog::GetInstance().Log("ClientChatServer::MessageBroadcast Broadcast 요청 받음 from pid=(%d), length=(%d), message=(%s)", 
                               pChatPacket->iPid, _tPacket.header.length, pChatPacket->message);
-
-  // for(int i = 0; i < m_pServerInfo->GetDNCnt(); i++)
-  // {
-  //   if( m_ChatServerInfo[i].iPid == pChatPacket->iPid) 
-  //   {
-  //     continue;
-  //   }
-  //   CNPLog::GetInstance().Log("ChatServer pid=(%d), requested pid=(%d)", m_ChatServerInfo[i].iPid, pChatPacket->iPid); 
-  //   // ClientSocket *socket = static_cast<ClientSocket *>(*iter);
-  //   // socket->Write((char *)&tSendPacket, PDUHEADERSIZE+tSendPacket.header.length);
-  // }
 
   std::list<Client *>::iterator iter = m_lstChatServer.begin();
   while( iter != m_lstChatServer.end() )
@@ -508,8 +370,7 @@ void ChatManager::DoFork(Process *_pProcess)
    */
   Client *pServer = NULL;
   serverInfoMap &tmpMap = (serverInfoMap &)m_pServerInfo->GetPortMap();
-  for(serverInfoMapItor itor = tmpMap.begin();
-      itor != tmpMap.end(); ++itor)
+  for(serverInfoMapItor itor = tmpMap.begin(); itor != tmpMap.end(); ++itor)
   {
     ServerSocket *pServerSocket = new ServerSocket(itor->first);
     pServerSocket->SetReUse();
@@ -560,28 +421,6 @@ void ChatManager::DoFork(Process *_pProcess)
   pServerSocket->SetLinger();
   pDNServer = new ClientServer(pServerSocket);
 
-  /**
-   * create shm to check DS status
-   */
-  SharedMemory smDSStatus((key_t)m_pServerInfo->GetShmDSStatus(), 100 * sizeof(struct TDSStatus));
-  if(!smDSStatus.IsStarted())
-  {
-    printf("DS Status SharedMemory ���� ���� \n");
-
-    // 2. destroy
-    SharedMemory sm((key_t)m_pServerInfo->GetShmDSStatus());
-    sm.Destroy();
-    return ;
-  }
-  m_pShmDSStatus = (struct TDSStatus *)smDSStatus.GetDataPoint();
-  if(m_pShmDSStatus == NULL)
-  {
-    printf("Shm is NULL \n");
-    return;
-  }
-  memset(m_pShmDSStatus, 0, 100 * sizeof(struct TDSStatus));
-  // **
-
   ((ChatServer *)_pProcess)->SetServerSocket(pDNServer);
 
   CNPLog::GetInstance().BackupLogFile2((char *)m_pServerInfo->GetLogFileName());
@@ -603,16 +442,6 @@ void ChatManager::Run()
     Assert(false, "LogFile create error! ");
     return;
   }
-  /*
-     }
-     */
-
-  // alloc release slot
-  //  m_pSlot = new ReleaseSlot(MAX_CLIENT);
-
-  // Download Server info table
-  m_ChatServerInfo = new Tcmd_HELLO_DSM_DS[m_pServerInfo->GetDNCnt()];
-  memset(m_ChatServerInfo, 0, m_pServerInfo->GetDNCnt() * sizeof(Tcmd_HELLO_DSM_DS));
 
   struct in_addr laddr;
   laddr.s_addr = m_iIPAddr;
@@ -642,7 +471,7 @@ void ChatManager::Run()
     {
   
 #ifdef _DEBUG
-      CNPLog::GetInstance().Log("epoll_wait error errno=%d, strerror=(%s)", errno, strerror(errno));
+      // CNPLog::GetInstance().Log("epoll_wait error errno=%d, strerror=(%s)", errno, strerror(errno));
 #endif
       if(!GetStarted())
       {

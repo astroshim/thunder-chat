@@ -18,11 +18,9 @@ class ServerInfoMgr;
 class CircularQueue;
 class ServerInfoDNMgr;
 
-
 const unsigned int MAX_DN = 10;
 const unsigned int MAX_CLIENT = 2000;
 const unsigned int MAX_MAC_LEN = 20;
-
 
 class ChatManager : public Process
 {
@@ -49,8 +47,8 @@ class ChatManager : public Process
     CircularQueue *m_pWorkQueue;
     CircularQueue *m_pBBSQueue;
 
-    Tcmd_HELLO_DSM_DS *m_ChatServerInfo; 
-    TDSStatus *m_pShmDSStatus; // for ds status
+    // Tcmd_HELLO_DSM_DS *m_ChatServerInfo; 
+    // TDSStatus *m_pShmDSStatus; // for ds status
 
     // ChatServer
     list<Client *> m_lstChatServer;
@@ -71,9 +69,6 @@ class ChatManager : public Process
 
     void Run();
     const int GetDNServerPort();
-    const char *const GetMRTGURL();
-    const char *const GetBBSURL();
-    const char *const GetBBSAuth();
     const char *const GetLogFileName();
 
     void DoFork(Process *_pProcess);
@@ -96,20 +91,15 @@ class ChatManager : public Process
     void PutWorkQueue(const void *const _pVoid);
     const void *const GetWorkQueue();
 
-    void PutBBSQueue(const void *const _pVoid);
-    const void *const GetBBSQueue();
-
     const unsigned int GetMacAddress();
     const unsigned int GetIPAddress();
 
     const int PostData(const char *_pData, const char *_pchURL);
     const int PostData(const char *_pData, const char *_pchURL, const char *_pchAuth);
 
-    const int SetDS(int *const _piSeq, int *const _piMaxUser, int *const _piShmKey, int *const _piShmDSStatus, const int _iPid);
-    void SettingDS(const int _iPos, int *const _piSeq, int *const _piMaxUser, int *const _piShmKey, int *const _piShmDSStatus, int _iPid);
+    const int SetDS(int *const _piMaxUser, int *const _piShmKey, int *const _piShmDSStatus);
 
     void PutClosedList(Tcmd_USER_CLOSE_DS_DSM *const _pClosedInfo);
-    const uint64_t GetClientDownloadSize(const uint32_t _nComCode, const uint32_t _nBillNo);
     void HealthCheckClosedList();
 };
 

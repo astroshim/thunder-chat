@@ -33,14 +33,14 @@ const int ClientChatServer::GetPid() {
 
 void ClientChatServer::WorkDSHello(const T_PACKET &_tPacket)
 {
-    int iSeq = 0, iMaxUser = 0, iShmKey = 0, iShmDSStatus = 0;
+    int iMaxUser = 0, iShmKey = 0, iShmDSStatus = 0;
     Tcmd_HELLO_DS_DSM *pClientBody = (Tcmd_HELLO_DS_DSM *)_tPacket.data;
 
     SetType(CLIENT_CHAT_SERVER);
     ChatManager *pManager = NULL;
     if ((pManager = dynamic_cast<ChatManager *>(m_pMainProcess)))
     {
-        if (pManager->SetDS(&iSeq, &iMaxUser, &iShmKey, &iShmDSStatus, pClientBody->iPid) < 0)
+        if (pManager->SetDS(&iMaxUser, &iShmKey, &iShmDSStatus) < 0)
         {
             CNPLog::GetInstance().Log("WorkDSHello DS OverFlow");
             return;
@@ -51,22 +51,20 @@ void ClientChatServer::WorkDSHello(const T_PACKET &_tPacket)
         CNPLog::GetInstance().Log("Work WorkDSHello(%p) pManager is NULL!! ", this);
     }
 
-    SetUserSeq(iSeq);
-
     T_PACKET tPacket;
     Tcmd_HELLO_DSM_DS *sndbody = (Tcmd_HELLO_DSM_DS *)tPacket.data;
     memset((char *)&tPacket, 0x00, sizeof(T_PACKET));
     tPacket.header.command = cmd_HELLO_DSM_DS;
     tPacket.header.length = sizeof(Tcmd_HELLO_DSM_DS);
 
-    sndbody->iSeq = iSeq;
+    // sndbody->iSeq = iSeq;
     sndbody->iMaxUser = iMaxUser;
-    sndbody->iShmKey = iShmKey;
-    sndbody->iShmDSStatus = iShmDSStatus;
-
-    CNPLog::GetInstance().Log("WorkDSHello seq=(%d), pid=(%d),maxUser=(%d), shmKey=(%d), shmDSStatusKey=(%d)",
-                              iSeq, pClientBody->iPid, iMaxUser, iShmKey, iShmDSStatus);
+    sndbody->iPid = pClientBody->iPid;
+    // sndbody->iShmKey = iShmKey;
+    // sndbody->iShmDSStatus = iShmDSStatus;
     m_iPid = pClientBody->iPid;
+
+    CNPLog::GetInstance().Log("WorkDSHello pid=(%d),maxUser=(%d)", pClientBody->iPid, iMaxUser);
 
     GetSocket()->Write((char *)&tPacket, PDUHEADERSIZE + tPacket.header.length);
 }

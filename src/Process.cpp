@@ -133,9 +133,9 @@ const bool Process::WatchChildProcessWithPipe()
     }
     else if (WIFSIGNALED(status))
     {
-      if (WIFEXITED(status) == SIGXFSZ) // file size excess.
-      {
-      }
+      // if (WIFEXITED(status) == SIGXFSZ) // file size excess.
+      // {
+      // }
 
       CNPLog::GetInstance().Log("2.Catch the signal. pid=(%d) status=(%d,%d)", wait_pid, status, WIFSIGNALED(status));
     }
@@ -171,9 +171,9 @@ const bool Process::WatchChildProcess()
     }
     else if (WIFSIGNALED(status))
     {
-      if (WIFEXITED(status) == SIGXFSZ) // file size excess.
-      {
-      }
+      // if (WIFEXITED(status) == SIGXFSZ) // file size excess.
+      // {
+      // }
       CNPLog::GetInstance().Log("2.Catch the signal. pid=(%d) status=(%d,%d)", wait_pid, status, WIFSIGNALED(status));
     }
 

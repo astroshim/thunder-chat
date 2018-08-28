@@ -10,8 +10,6 @@ private:
 
   int m_iSeq;
   int m_iPid;
-  // int m_iMaxUser;
-  // int m_iShmKey;
 
 public:
   ClientChatServer();

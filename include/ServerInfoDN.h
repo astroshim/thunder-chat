@@ -28,7 +28,6 @@ class ServerInfoDN
     threadMap     m_mapThreadCount; // thread list
 
     int   m_iMaxUser;         // max connection user
-    int   m_iShmKey;
     //  int   m_iMgrServerPort;
     //  int   m_iMessageQ;
     char  m_pchIPAddr[MAX_IP_LEN];  // ip addr
@@ -49,7 +48,6 @@ class ServerInfoDN
     ServerInfoDN(Properties &_cProperties);
     ~ServerInfoDN();
 
-    const int GetShmKey();
     const int   GetMaxUser();
     void  SetMaxUser(const int _iMaxUser);
     const char* const GetLogFileName();
@@ -57,7 +55,6 @@ class ServerInfoDN
     //  const int GetMessageQID();
     const char* const GetUnixSockPath();
 
-    const char* const GetMRTGURL();
     const char* const GetVolName();
     const char* const GetDirName();
     const char* const GetManagerIpAddresses();
