@@ -336,16 +336,16 @@ const int ChatManager::SetDS(int* const _piMaxUser, int* const _piShmKey, int* c
 const int ChatManager::MessageBroadcast(const T_PACKET &_tPacket)
 {
   Tcmd_CHAT_DS_DSM *pChatPacket = (Tcmd_CHAT_DS_DSM *)_tPacket.data;
-  CNPLog::GetInstance().Log("ClientChatServer::MessageBroadcast Broadcast 요청 받음 from pid=(%d), length=(%d), message=(%s)", 
-                              pChatPacket->iPid, _tPacket.header.length, pChatPacket->message);
+  CNPLog::GetInstance().Log("ClientChatServer::MessageBroadcast Broadcast 요청 받음 from uniqId=(%llu), length=(%d), message=(%s)", 
+                              pChatPacket->uniqId, _tPacket.header.length, pChatPacket->message);
 
   std::list<Client *>::iterator iter = m_lstChatServer.begin();
   while( iter != m_lstChatServer.end() )
   {
     ClientChatServer *chatServer = static_cast<ClientChatServer *>(*iter);
-    if( chatServer->GetPid() != pChatPacket->iPid) 
+    if( chatServer->GetUniqId() != pChatPacket->uniqId) 
     {
-      CNPLog::GetInstance().Log("message broadcasting from manager to (%d)", chatServer->GetSocket()->GetFd());
+      CNPLog::GetInstance().Log("message broadcasting from manager to (%llu)", chatServer->GetUniqId());
       chatServer->GetSocket()->Write((char *)&_tPacket, PDUHEADERSIZE+_tPacket.header.length);
     }
 
@@ -373,7 +373,7 @@ void ChatManager::DoFork(Process *_pProcess)
   for(serverInfoMapItor itor = tmpMap.begin(); itor != tmpMap.end(); ++itor)
   {
     ServerSocket *pServerSocket = new ServerSocket(itor->first);
-    pServerSocket->SetReUse();
+    // pServerSocket->SetReUse();
     if(pServerSocket->Bind(itor->second) < 0)
     {
       return;
@@ -387,7 +387,7 @@ void ChatManager::DoFork(Process *_pProcess)
       return;
     }
     pServerSocket->SetLinger();
-
+    // pServerSocket->SetReUse();
     pServer = new ClientServer(pServerSocket);
     ///
     //   ServerSocket add to IOMP.
@@ -419,6 +419,7 @@ void ChatManager::DoFork(Process *_pProcess)
   }
 
   pServerSocket->SetLinger();
+  // pServerSocket->SetReUse();
   pDNServer = new ClientServer(pServerSocket);
 
   ((ChatServer *)_pProcess)->SetServerSocket(pDNServer);

@@ -51,9 +51,9 @@ class ChatServer : public Process
 
     list<ClientSocket *> m_lstChatManagerSocket;
 
-    int m_iSeq;
     int m_iMaxUser;
-    char uniqId[32];
+    // char uniqId[32];
+    unsigned long long m_uniqId;
 
   public:
     ChatServer();
@@ -102,7 +102,8 @@ class ChatServer : public Process
     const char *const GetVolName();
     const char *const GetDirName();
 
-    const char *const GetUniqId();
+    // const char *const GetUniqId();
+    const unsigned long long GetUniqId();
 
     const uint64_t GetDownloadSize(const uint32_t _nBillNo);
 

@@ -15,12 +15,12 @@ ClientChatServer::~ClientChatServer()
 {
 }
 
-void ClientChatServer::SetPid(int _pid) { 
-    m_iPid = _pid;
+void ClientChatServer::SetUniqId(int _uniqId) { 
+    m_uniqId = _uniqId;
 }
 
-const int ClientChatServer::GetPid() {
-    return m_iPid;
+const int ClientChatServer::GetUniqId() {
+    return m_uniqId;
 }
 
 void ClientChatServer::WorkDSHello(const T_PACKET &_tPacket)
@@ -50,12 +50,12 @@ void ClientChatServer::WorkDSHello(const T_PACKET &_tPacket)
     tPacket.header.length = sizeof(Tcmd_HELLO_DSM_DS);
 
     sndbody->iMaxUser = iMaxUser;
-    sndbody->iPid = pClientBody->iPid;
+    // sndbody->iPid = pClientBody->iPid;
     // sndbody->iShmKey = iShmKey;
     // sndbody->iShmDSStatus = iShmDSStatus;
-    m_iPid = pClientBody->iPid;
-
-    CNPLog::GetInstance().Log("WorkDSHello pid=(%d),maxUser=(%d)", pClientBody->iPid, iMaxUser);
+    // m_iPid = pClientBody->iPid;
+    m_uniqId = pClientBody->uniqId;
+    CNPLog::GetInstance().Log("WorkDSHello pid=(%llu),maxUser=(%d)", pClientBody->uniqId, iMaxUser);
 
     GetSocket()->Write((char *)&tPacket, PDUHEADERSIZE + tPacket.header.length);
 }

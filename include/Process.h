@@ -59,14 +59,8 @@ class Process
     pid_t   m_Pid;
     bool  m_IsStarted;
     int     m_iSignalNo;
-    //  int m_iSeq; // server seq
 
     Process *m_pChild;
-
-    /*
-       const int AddChildPid(const pid_t _pid);
-       const int DelChildPid(const pid_t _pid);
-     */
 
 };
 #endif

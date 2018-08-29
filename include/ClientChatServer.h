@@ -6,10 +6,7 @@
 class ClientChatServer : public Client
 {
 private:
-  // Chat Server information
-
-  int m_iSeq;
-  int m_iPid;
+  uint64_t m_uniqId;
 
 public:
   ClientChatServer();
@@ -29,8 +26,8 @@ public:
   void MessageBroadcast(const T_PACKET &_tPacket);
   const int ExecuteCommand(Thread *_pThread);
 
-  const int GetPid();
-  void SetPid(int _pid);
+  const int GetUniqId();
+  void SetUniqId(int _uniqId);
 };
 
 #endif

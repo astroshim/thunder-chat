@@ -36,11 +36,13 @@ ChatServer::ChatServer()
   ,m_pReceiveQueue(NULL)
   ,m_pSendQueue(NULL)
   ,m_pBroadcastQueue(NULL)
-  ,m_iSeq(-1)
   ,m_iMaxUser(0)
+  ,m_uniqId(0)
 {
   this->SetStarted(false);
   pthread_mutex_init(&m_lockClient, NULL);
+
+  // m_uniqId = CNPUtil::GetUnixTime() + getpid();
 }
 
 ChatServer::ChatServer(Properties& _cProperties)
@@ -50,12 +52,14 @@ ChatServer::ChatServer(Properties& _cProperties)
   ,m_pReceiveQueue(new CircularQueue())
   ,m_pSendQueue(new CircularQueue())
   ,m_pBroadcastQueue(new CircularQueue())
-  ,m_iSeq(-1)
   ,m_iMaxUser(0)
+  ,m_uniqId(0)
 {
   this->SetStarted(false);
   pthread_mutex_init(&m_lockClient, NULL);
   m_pServerInfo = new ServerInfoDN(_cProperties);
+
+  // m_uniqId = CNPUtil::GetUnixTime() + getpid();
 }
 
 ChatServer::~ChatServer()
@@ -67,6 +71,11 @@ ChatServer::~ChatServer()
   delete m_pSendQueue;
   delete m_pBroadcastQueue;
   delete m_pDNServerSocket;
+}
+
+const unsigned long long ChatServer::GetUniqId() 
+{
+  return m_uniqId;
 }
 
 const int ChatServer::GetCurrentUserCount()
@@ -178,7 +187,10 @@ const int ChatServer::ConnectToMgr()
 
 ClientSocket* const ChatServer::NegotiationWithManager(string server, int port)
 {
-  CNPLog::GetInstance().Log("Trying Connect to Mgr.. (%s)(%d)", server.c_str(), port);
+  m_uniqId = CNPUtil::GetUnixTime() + getpid();
+
+  CNPLog::GetInstance().Log("Trying Connect to Mgr.. (%s)(%d) from (%llu), %lu", 
+                                server.c_str(), port, GetUniqId(), getpid());
 
   ClientSocket *pCSocket = new ClientSocket();
   if(pCSocket->Connect(server.c_str(), port) < 0)
@@ -197,7 +209,8 @@ ClientSocket* const ChatServer::NegotiationWithManager(string server, int port)
   tHelloPacket.header.command = cmd_HELLO_DS_DSM;
   tHelloPacket.header.length = sizeof(Tcmd_HELLO_DS_DSM);
 
-  sndbody->iPid = GetPid();
+  // sndbody->iPid = GetPid();
+  sndbody->uniqId = GetUniqId();
 
   if(pCSocket->Write((char *)&tHelloPacket, PDUHEADERSIZE+sizeof(Tcmd_HELLO_DS_DSM)) < 0)
   {
@@ -222,7 +235,7 @@ ClientSocket* const ChatServer::NegotiationWithManager(string server, int port)
 
   Tcmd_HELLO_DSM_DS *pRcvBody = (Tcmd_HELLO_DSM_DS *)tHelloPacket.data;
 
-  CNPLog::GetInstance().Log("pRcvBody->iPid = (%d)", pRcvBody->iPid); 
+  CNPLog::GetInstance().Log("pRcvBody->uniqId = (%d)", pRcvBody->uniqId); 
   CNPLog::GetInstance().Log("pRcvBody->iMaxUser = (%d)", pRcvBody->iMaxUser); 
   CNPLog::GetInstance().Log("pRcvBody->dHelloTime = (%d)", pRcvBody->dHelloTime); 
   SetMaxUser(pRcvBody->iMaxUser);
@@ -354,9 +367,11 @@ void ChatServer::MessageBroadcastToManagers(BroadcastMessage *_message)
   Tcmd_CHAT_DS_DSM *sndbody = (Tcmd_CHAT_DS_DSM *)tSendPacket.data;
 
   tSendPacket.header.command  = cmd_CHAT_DS_DSM;
-  tSendPacket.header.length   = _message->GetMessageSize() + sizeof(unsigned int);
+  tSendPacket.header.length   = _message->GetMessageSize() + sizeof(uint64_t);
+  // tSendPacket.header.length   = _message->GetMessageSize() + sizeof(unsigned int);
 
-  sndbody->iPid = GetPid();
+  sndbody->uniqId = GetUniqId();
+  // sndbody->iPid = GetPid();
   memcpy(sndbody->message, _message->GetMessage(), _message->GetMessageSize());
 
   std::list<ClientSocket*>::iterator iter = m_lstChatManagerSocket.begin();
@@ -364,12 +379,8 @@ void ChatServer::MessageBroadcastToManagers(BroadcastMessage *_message)
   {
     ClientSocket *socket = static_cast<ClientSocket *>(*iter);
 
-    #ifdef _FREEBSD
-    CNPLog::GetInstance().Log("ChatServer::MessageBroadcastToManagers message socket=(%d), message=(%s)",  
-            socket->GetFd(), _message->GetMessage());
-    #endif
-
-    CNPLog::GetInstance().Log("ChatServer:: 메세지를 manager로 relay ! size=(%d), message=(%s)", tSendPacket.header.length, sndbody->message);
+    CNPLog::GetInstance().Log("ChatServer:: 메세지를 manager로 relay from (%llu) ! size=(%d), message=(%s)", 
+                        sndbody->uniqId, tSendPacket.header.length, sndbody->message, sndbody->uniqId);
 
     socket->Write((char *)&tSendPacket, PDUHEADERSIZE+tSendPacket.header.length);
     iter++;
@@ -390,8 +401,6 @@ int ChatServer::RegisterManager()
 
 void ChatServer::MessageBroadcast(BroadcastMessage *_message)
 {
-  CNPLog::GetInstance().Log("ChatServer:: message type => %d", _message->GetMessageType());
-
   if (_message->GetMessageType() != RELAYED_MESSAGE) 
   {
     MessageBroadcastToManagers(_message);
@@ -463,6 +472,9 @@ void ChatServer::Run()
     ThreadManager::GetInstance()->Spawn(t);
     CNPLog::GetInstance().Log("In ChatServer Broadcaster Create (%p,%lu) ", t, t->GetThreadID());
   }
+
+// fprintf(stderr, "uniqid => (%llu)\n", m_iMacAddr*getpid());
+
 
   // ThreadTic *tTic = new ThreadTic(this);
   // ThreadManager::GetInstance()->Spawn(tTic);

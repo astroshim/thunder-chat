@@ -4,7 +4,6 @@
 
 Process::Process()
     : m_PPid(0), m_Pid(0), m_IsStarted(false), m_iSignalNo(0)
-      //      ,m_iSeq(-1)
       ,
       m_pChild(NULL)
 {

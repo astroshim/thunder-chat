@@ -167,7 +167,8 @@ const int ChatUser::ExecuteCommand(Thread *_pThread)
       BroadcastMessage *broadcastMessage = new BroadcastMessage();
       Tcmd_CHAT_DS_DSM *pChatPacket = (Tcmd_CHAT_DS_DSM *)tPacket.data;
 
-      int messageSize = pPacketHeader->length - sizeof(uint32_t);
+      // int messageSize = pPacketHeader->length - sizeof(uint32_t);
+      int messageSize = pPacketHeader->length - sizeof(uint64_t);
 #ifdef _DEBUG
       CNPLog::GetInstance().Log("MESSAGE, packet_length=(%d), messageSize=(%d)(%s)", pPacketHeader->length, messageSize, pChatPacket->message);
 #endif
