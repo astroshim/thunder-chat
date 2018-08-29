@@ -209,7 +209,6 @@ ClientSocket* const ChatServer::NegotiationWithManager(string server, int port)
   tHelloPacket.header.command = cmd_HELLO_DS_DSM;
   tHelloPacket.header.length = sizeof(Tcmd_HELLO_DS_DSM);
 
-  // sndbody->iPid = GetPid();
   sndbody->uniqId = GetUniqId();
 
   if(pCSocket->Write((char *)&tHelloPacket, PDUHEADERSIZE+sizeof(Tcmd_HELLO_DS_DSM)) < 0)
@@ -234,7 +233,6 @@ ClientSocket* const ChatServer::NegotiationWithManager(string server, int port)
   }
 
   Tcmd_HELLO_DSM_DS *pRcvBody = (Tcmd_HELLO_DSM_DS *)tHelloPacket.data;
-
   CNPLog::GetInstance().Log("pRcvBody->uniqId = (%d)", pRcvBody->uniqId); 
   CNPLog::GetInstance().Log("pRcvBody->iMaxUser = (%d)", pRcvBody->iMaxUser); 
   CNPLog::GetInstance().Log("pRcvBody->dHelloTime = (%d)", pRcvBody->dHelloTime); 

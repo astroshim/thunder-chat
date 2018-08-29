@@ -47,13 +47,9 @@ class ChatManager : public Process
     CircularQueue *m_pWorkQueue;
     CircularQueue *m_pBBSQueue;
 
-    // Tcmd_HELLO_DSM_DS *m_ChatServerInfo; 
-    // TDSStatus *m_pShmDSStatus; // for ds status
-
     // ChatServer
     list<Client *> m_lstChatServer;
     pthread_mutex_t m_lockClient;
-    //mapConnection   m_mapConnectList;
 
     list<Tcmd_USER_CLOSE_DS_DSM *> m_lstClosed;
     pthread_mutex_t m_lockClosed;
@@ -97,7 +93,7 @@ class ChatManager : public Process
     const int PostData(const char *_pData, const char *_pchURL);
     const int PostData(const char *_pData, const char *_pchURL, const char *_pchAuth);
 
-    const int SetDS(int *const _piMaxUser, int *const _piShmKey, int *const _piShmDSStatus);
+    const int SetDS(int *const _piMaxUser);
 
     void PutClosedList(Tcmd_USER_CLOSE_DS_DSM *const _pClosedInfo);
     void HealthCheckClosedList();

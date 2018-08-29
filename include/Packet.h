@@ -153,7 +153,6 @@ typedef struct
 // hello DS -> DSM
 typedef struct
 {
-  // uint32_t iPid;  // chat server pid
   uint64_t uniqId;
   char message[1000];
 }Tcmd_CHAT_DS_DSM;
@@ -161,19 +160,14 @@ typedef struct
 // hello DS -> DSM
 typedef struct
 {
-  // uint32_t iPid;
   uint64_t uniqId;
 }Tcmd_HELLO_DS_DSM;
 
 // hello DSM -> DS
 typedef struct
 {
-  // uint32_t iSeq;
-  // uint32_t iPid;
   uint64_t uniqId;
   uint32_t iMaxUser;
-  // uint32_t iShmKey;
-  // uint32_t iShmDSStatus;
   double   dHelloTime;
 }Tcmd_HELLO_DSM_DS;
 

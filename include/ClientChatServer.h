@@ -13,8 +13,8 @@ public:
   ClientChatServer(Socket *const _cSocket);
   virtual ~ClientChatServer();
 
-  // DC->DSM command
-  void WorkDSHello(const T_PACKET &_tPacket);
+  // ChatServer->ChatManager command
+  void WorkChatServerHello(const T_PACKET &_tPacket);
   void WorkUserClose(const T_PACKET &_tPacket);
 
   // DC->DSM command

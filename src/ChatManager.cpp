@@ -327,7 +327,7 @@ void ChatManager::CloseClient(Client* const _pClient)
   m_iConnCount--;
 }
 
-const int ChatManager::SetDS(int* const _piMaxUser, int* const _piShmKey, int* const _piShmDSStatus)
+const int ChatManager::SetDS(int* const _piMaxUser)
 {
   *_piMaxUser   = m_pServerInfo->GetDSMaxUser();
   return 0;
