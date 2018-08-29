@@ -1,7 +1,6 @@
 *.o
 MainProcess.o
-DNServer
-DownloadServer
+ChatServer
 logs/
 **/shell/*
 **/*.o
@@ -12,3 +11,4 @@ __assertion_failed.log
 .vscode/
 client/chat_client
 client/chat_server
+build
