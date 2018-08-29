@@ -94,7 +94,7 @@ void CircularBuff::Resize()
 
   m_iBufferSize = m_iBufferSize + CIR_BUFSIZE;
   m_iHead = 0;
-  m_iTail = m_iUseBufferSize = m_iUseBufferSize;
+  m_iTail = m_iUseBufferSize;
 }
 
 const int CircularBuff::Put(const char *const _pchBuffer, const int _iLength)

@@ -22,7 +22,7 @@ const int ClientSocket::Connect(const char* const _pchAddr, const int _iPort)
 
   if(!_pchAddr)
   {
-    stServerAddr->sin_addr.s_addr = inet_addr(INADDR_ANY);
+    stServerAddr->sin_addr.s_addr = htonl(INADDR_ANY);
   }
   else
   {
@@ -49,7 +49,7 @@ const int ClientSocket::NonBlockConnect(const char* const _pchAddr, const int _i
 
   if(!_pchAddr)
   {
-    stServerAddr->sin_addr.s_addr = inet_addr(INADDR_ANY);
+    stServerAddr->sin_addr.s_addr = htonl(INADDR_ANY);
   }
   else
   {

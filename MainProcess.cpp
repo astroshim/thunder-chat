@@ -6,6 +6,8 @@
 #include "./include/NPDebug.h"
 
 static const char *g_Version = "1.0.1";
+static char CHATSERVER_PROPERTIES[] = "./ChatServer.properties";
+static char MANAGER_PROPERTIES[] = "./ChatManager.properties";
 
 void SetLimit()
 {

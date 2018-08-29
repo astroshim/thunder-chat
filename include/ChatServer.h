@@ -3,7 +3,7 @@
 
 #include "./Process.h"
 
-#define CHATSERVER_PROPERTIES "./ChatServer.properties"
+// #define CHATSERVER_PROPERTIES "./ChatServer.properties"
 
 class Socket;
 class Client;

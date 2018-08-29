@@ -8,13 +8,23 @@ if(UNIX AND NOT APPLE)
   set(LINUX TRUE)
 endif()
 
+#set(CMAKE_CXX_COMPILER "g++")
+#set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -std=c++11 -stdlib=libc++")
+
+#set(CMAKE_CXX_STANDARD 14)
+#set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+
+if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
+endif()
+
+#link_libraries("-std=c++11 -stdlib=libc++")
 
 if(LINUX)
   message(STATUS ">>> Linux")
                     
   add_definitions(-D_REENTRANT -D_FILE_OFFSET_BITS=64 -D_ONESHOT -D_DEBUG)
-
-  include_directories(/usr/local/opt/openssl/include)
 
   add_executable(ChatServer 
         MainProcess.cpp 		

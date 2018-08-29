@@ -292,7 +292,7 @@ void CNPUtil::GetMicroTime(char *_pchTimeString)
      and the milliseconds. */
   //  printf ("%s.%03ld\n", _pchTimeString, milliseconds);
 
-  sprintf(_pchTimeString, "%s%ld", _pchTimeString, tv.tv_usec);
+  sprintf(_pchTimeString, "%s%d", _pchTimeString, tv.tv_usec);
 }
 
 int CNPUtil::GetMin()

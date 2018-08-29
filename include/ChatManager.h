@@ -4,7 +4,7 @@
 #include "./Process.h"
 #include "./Packet.h"
 
-#define MANAGER_PROPERTIES "./ChatManager.properties"
+// #define MANAGER_PROPERTIES "./ChatManager.properties"
 
 class Client;
 #ifdef _FREEBSD
