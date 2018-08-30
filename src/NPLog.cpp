@@ -83,10 +83,6 @@ void CNPLog::BackupLogFile2(char *_pchFileName)
   memcpy(logdname, name_start, size);
   logdname[size] = '\0';
 
-  /*
-  memset(pchOrder, 0x00, sizeof(pchOrder));
-  sprintf( pchOrder, "\mv /root/DownloadServer/%s* /root/DownloadServer/%sold_log/", logdname, logdname);
-*/
   memset(pchOrder, 0x00, sizeof(pchOrder));
   sprintf(pchOrder, "rm /root/thunder/%s* > /dev/null 2>&1", logdname);
 

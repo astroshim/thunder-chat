@@ -28,8 +28,6 @@ class ServerInfoDN
     threadMap     m_mapThreadCount; // thread list
 
     int   m_iMaxUser;         // max connection user
-    //  int   m_iMgrServerPort;
-    //  int   m_iMessageQ;
     char  m_pchIPAddr[MAX_IP_LEN];  // ip addr
     char  m_pchLogFile[LOG_FILE_LEN]; // log filename length
     char  m_pchUnixSockPath[UNIX_PATH_MAX];
@@ -52,15 +50,12 @@ class ServerInfoDN
     void  SetMaxUser(const int _iMaxUser);
     const char* const GetLogFileName();
     const char* const GetIPAddr();
-    //  const int GetMessageQID();
     const char* const GetUnixSockPath();
 
-    const char* const GetVolName();
-    const char* const GetDirName();
     const char* const GetManagerIpAddresses();
 
     const serverInfoMap&    GetPortMap();
-    const int GetPort(const ENUM_SERVERSOCKET_TYPE _type);  // ��û�� port type�� ���� �ش� port�� return �Ѵ�.
+    const int GetPort(const ENUM_SERVERSOCKET_TYPE _type);  
     const int GetThreadCount(const ENUM_THREAD_TYPE _type);
 
     const unsigned int  GetBandwidth(const unsigned char _chID);

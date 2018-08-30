@@ -56,89 +56,6 @@ void ClientChatServer::WorkChatServerHello(const T_PACKET &_tPacket)
     GetSocket()->Write((char *)&tPacket, PDUHEADERSIZE + tPacket.header.length);
 }
 
-// void ClientChatServer::WorkUserClose(const T_PACKET &_tPacket) //client close
-// {
-//     Tcmd_USER_CLOSE_DS_DSM *pClientBody = (Tcmd_USER_CLOSE_DS_DSM *)_tPacket.data;
-
-//     Tcmd_USER_CLOSE_DS_DSM *pClosed = new Tcmd_USER_CLOSE_DS_DSM;
-//     memcpy(pClosed, pClientBody, sizeof(Tcmd_USER_CLOSE_DS_DSM));
-
-//     CNPLog::GetInstance().Log("Work UserClose pClosed=(%p), nBillNo=(%d), nDownSize=(%llu)",
-//                               pClosed, pClosed->nBillNo, pClosed->nDownSize);
-//     /*
-//     CNPLog::GetInstance().Log("Work UserClose pClosed=(%p), nComCode=(%d), nBillNo=(%d), nDownSize=(%llu)",
-//               pClosed, pClosed->nComCode, pClosed->nBillNo, pClosed->nDownSize);
-// */
-//     ChatManager *pManager = NULL;
-//     if ((pManager = dynamic_cast<ChatManager *>(m_pMainProcess)))
-//     {
-//         pManager->PutClosedList(pClosed);
-//     }
-//     else
-//     {
-//         CNPLog::GetInstance().Log("Work UserClose(%p) pManager is NULL!! ", this);
-//     }
-// }
-
-/**
-  * DC <---> DSM
- */
-// void ClientChatServer::WorkDSMHello(const T_PACKET &_tPacket)
-// {
-//     T_PACKET *pSendPacket = new T_PACKET;
-//     memset((char *)pSendPacket, 0x00, sizeof(T_PACKET));
-//     pSendPacket->header.command = cmd_HELLO_DSM_DC;
-//     pSendPacket->header.length = 0;
-
-//     //CNPLog::GetInstance().Log("ClientChatServer::DSM Hello(%d)", ((Socket *)(GetSocket()))->GetFd());
-
-//     //((Socket *)(GetSocket()))->Write((char *)pSendPacket, PDUHEADERSIZE+pSendPacket->header.length);
-//     GetSocket()->Write((char *)pSendPacket, PDUHEADERSIZE + pSendPacket->header.length);
-//     delete pSendPacket;
-// }
-
-void ClientChatServer::WorkGetDSInfo(const T_PACKET &_tPacket)
-{
-    T_PACKET *pSendPacket = new T_PACKET;
-    Tcmd_GET_DS_INFO_DSM_DC *sndbody = (Tcmd_GET_DS_INFO_DSM_DC *)pSendPacket->data;
-    memset((char *)pSendPacket, 0x00, sizeof(T_PACKET));
-    pSendPacket->header.command = cmd_GET_DS_INFO_DSM_DC;
-    pSendPacket->header.length = sizeof(Tcmd_GET_DS_INFO_DSM_DC);
-
-    sndbody->iCmd = cmd_GET_DS_INFO_DSM_DC;
-
-    sndbody->iPort = m_pMainProcess->GetDNServerPort();
-    //sndbody->iIP    = htonl(INADDR_ANY);
-    //sndbody->iIP    = ((ChatManager *)m_pMainProcess)->GetIPAddress();
-    ChatManager *pManager = NULL;
-    if ((pManager = dynamic_cast<ChatManager *>(m_pMainProcess)))
-    {
-        sndbody->iIP = pManager->GetIPAddress();
-    }
-    else
-    {
-        CNPLog::GetInstance().Log("Work WorkGetDSInfo(%p) pManager is NULL!! ", this);
-    }
-
-    CNPLog::GetInstance().Log("ClientChatServer::DSM GetDSInfo ip=(%lu)", sndbody->iIP);
-    //((Socket *)(GetSocket()))->Write((char *)pSendPacket, PDUHEADERSIZE+pSendPacket->header.length);
-    GetSocket()->Write((char *)pSendPacket, PDUHEADERSIZE + pSendPacket->header.length);
-    delete pSendPacket;
-}
-
-// void ClientChatServer::WorkGoodBye(const T_PACKET &_tPacket)
-// {
-//     T_PACKET *pSendPacket = new T_PACKET;
-//     memset((char *)pSendPacket, 0x00, sizeof(T_PACKET));
-//     pSendPacket->header.command = cmd_GOODBYE_DSM_DC;
-//     pSendPacket->header.length = 0;
-
-//     //CNPLog::GetInstance().Log("ClientChatServer::WorkGoodBye(%d)", ((Socket *)(GetSocket()))->GetFd());
-//     //((Socket *)(GetSocket()))->Write((char *)pSendPacket, PDUHEADERSIZE+pSendPacket->header.length);
-//     GetSocket()->Write((char *)pSendPacket, PDUHEADERSIZE + pSendPacket->header.length);
-//     delete pSendPacket;
-// }
-
 void ClientChatServer::WorkDSMPing(const T_PACKET &_tPacket)
 {
     T_PACKET *pSendPacket = new T_PACKET;
@@ -154,7 +71,7 @@ void ClientChatServer::WorkDSMPing(const T_PACKET &_tPacket)
 
 void ClientChatServer::MessageBroadcast(const T_PACKET &_tPacket)
 {
-    Tcmd_CHAT_DS_DSM *pChatPacket = (Tcmd_CHAT_DS_DSM *)_tPacket.data;
+    Tcmd_CHAT_BROADCAST *pChatPacket = (Tcmd_CHAT_BROADCAST *)_tPacket.data;
     ChatManager *pManager = NULL;
     if ((pManager = dynamic_cast<ChatManager *>(m_pMainProcess)))
     {
@@ -186,36 +103,17 @@ const int ClientChatServer::ExecuteCommand(Thread *_pThread)
 
     switch (tPacket.header.command)
     {
-    // DS -> DSM
-    case cmd_CHAT_DS_DSM:
+    case cmd_CHAT_BROADCAST:
         MessageBroadcast(tPacket);
         break;
 
-    // DS -> DSM
     case cmd_HELLO_DS_DSM:
         WorkChatServerHello(tPacket);
         break;
-    // case cmd_USER_CLOSE_DS_DSM:
-    //     WorkUserClose(tPacket);
-    //     break;
-
-    // // DC -> DSM
-    // case cmd_HELLO_DC_DSM: // blank packet
-    //     WorkDSMHello(tPacket);
-    //     break;
-
-    case cmd_GET_DS_INFO_DC_DSM:
-        WorkGetDSInfo(tPacket);
-        break;
-
-    // case cmd_GOODBYE_DC_DSM: // blank packet
-    //     WorkGoodBye(tPacket);
-    //     break;
 
     case cmd_HEARTBEAT_DC_DSM:
         WorkDSMPing(tPacket);
         break;
-        // ===>> DSM command
 
     default:
         //WorkDSMPing(tPacket);

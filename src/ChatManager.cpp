@@ -33,27 +33,21 @@
 ChatManager::ChatManager()
   :m_pIOMP(NULL)
   ,m_iConnCount(0)
-  ,m_iMacAddr(0)
-  ,m_iIPAddr(0)
   ,m_pServerInfo(NULL)
   ,m_pWorkQueue(NULL)
 {
   this->SetStarted(false);
   pthread_mutex_init(&m_lockClient, NULL);
-  pthread_mutex_init(&m_lockClosed, NULL);
   m_pchStatistics = new char[MAX_STATISTICS];
 }
 
 ChatManager::ChatManager(Properties& _cProperties)
   :m_pIOMP(NULL)
   ,m_iConnCount(0)
-  ,m_iMacAddr(0)
-  ,m_iIPAddr(0)
   ,m_pWorkQueue(new CircularQueue())
 {
   this->SetStarted(false);
   pthread_mutex_init(&m_lockClient, NULL);
-  pthread_mutex_init(&m_lockClosed, NULL);
   m_pServerInfo = new ServerInfoDNMgr(_cProperties);
   m_pchStatistics = new char[MAX_STATISTICS];
 }
@@ -85,16 +79,6 @@ const char* const ChatManager::GetIPAddr()
 const int ChatManager::GetDNServerPort()
 {
   return m_pServerInfo->GetDNPort();
-}
-
-const unsigned int ChatManager::GetMacAddress()
-{
-  return m_iMacAddr;
-}
-
-const unsigned int ChatManager::GetIPAddress()
-{
-  return m_iIPAddr;
 }
 
 const char* const ChatManager::GetLogFileName()
@@ -214,43 +198,6 @@ const void* const ChatManager::GetWorkQueue()
   return m_pWorkQueue->DeQueue();
 }
 
-void ChatManager::PutClosedList(Tcmd_USER_CLOSE_DS_DSM* const _pClosedInfo)
-{
-  pthread_mutex_lock(&m_lockClosed);
-  CNPLog::GetInstance().Log("ChatManager::PutClosedList =>(%p)", _pClosedInfo);
-  m_lstClosed.push_back(_pClosedInfo);
-  pthread_mutex_unlock(&m_lockClosed);
-}
-
-void ChatManager::HealthCheckClosedList()
-{
-
-  pthread_mutex_lock(&m_lockClosed);
-  //CNPLog::GetInstance().Log("ChatManager::HealthCheckClosedList list_size=(%d), max=(%d)", m_lstClosed.size(), m_lstClosed.max_size());
-
-  std::list<Tcmd_USER_CLOSE_DS_DSM*>::iterator iter = m_lstClosed.begin();
-  while( iter != m_lstClosed.end() )
-  {
-    Tcmd_USER_CLOSE_DS_DSM *pClosedInfo = static_cast<Tcmd_USER_CLOSE_DS_DSM *>(*iter);
-
-    double dNow = CNPUtil::GetMicroTime();
-    if((dNow - pClosedInfo->dClosedTime) > TIME_ALIVE)
-    {
-      CNPLog::GetInstance().Log("ChatManager::HealthCheckClosedList(%p) Kill \
-          comcode=(%d),billno=(%d),downSize=(%llu), (%.2f)",
-          pClosedInfo, pClosedInfo->nComCode, pClosedInfo->nBillNo, pClosedInfo->nDownSize, dNow);
-
-      iter = m_lstClosed.erase( iter );
-      delete pClosedInfo;
-    }
-
-    iter++;
-  }
-
-  pthread_mutex_unlock(&m_lockClosed);
-}
-
-
 void ChatManager::HealthCheckUsers()
 {
   pthread_mutex_lock(&m_lockClient);
@@ -281,7 +228,7 @@ void ChatManager::HealthCheckUsers()
     iter++;
   }
   pthread_mutex_unlock(&m_lockClient);
-  HealthCheckClosedList();
+  // HealthCheckClosedList();
 }
 
 void ChatManager::UpdateEPoll(Client* const _pClient, const unsigned int _uiEvents)
@@ -335,7 +282,7 @@ const int ChatManager::SetDS(int* const _piMaxUser)
 
 const int ChatManager::MessageBroadcast(const T_PACKET &_tPacket)
 {
-  Tcmd_CHAT_DS_DSM *pChatPacket = (Tcmd_CHAT_DS_DSM *)_tPacket.data;
+  Tcmd_CHAT_BROADCAST *pChatPacket = (Tcmd_CHAT_BROADCAST *)_tPacket.data;
   CNPLog::GetInstance().Log("ClientChatServer::MessageBroadcast Broadcast 요청 받음 from uniqId=(%llu), length=(%d), message=(%s)", 
                               pChatPacket->uniqId, _tPacket.header.length, pChatPacket->message);
 
@@ -436,7 +383,7 @@ void ChatManager::Run()
 {
   this->SetStarted(true);
 
-  CNPUtil::GetIPConfig(&m_iMacAddr, &m_iIPAddr);
+  // CNPUtil::GetIPConfig(&m_iMacAddr, &m_iIPAddr);
 
   if(CNPLog::GetInstance().SetFileName((char *)(m_pServerInfo->GetLogFileName())) )
   {
@@ -444,11 +391,11 @@ void ChatManager::Run()
     return;
   }
 
-  struct in_addr laddr;
-  laddr.s_addr = m_iIPAddr;
+  // struct in_addr laddr;
+  // laddr.s_addr = m_iIPAddr;
 
-  struct ether_addr haddr;
-  memcpy((void *)&haddr, (void *)&m_iMacAddr, 6);
+  // struct ether_addr haddr;
+  // memcpy((void *)&haddr, (void *)&m_iMacAddr, 6);
 
   // Worker create.
   for(int i = 0; i < m_pServerInfo->GetThreadCount(THREAD_WORKER); i++)

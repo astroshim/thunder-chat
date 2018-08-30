@@ -78,53 +78,6 @@ void ChatUser::SendPacket(const T_PACKET *_pPacket)
 #endif
 }
 
-void ChatUser::WorkHello(const T_PACKET &_tPacket)
-{
-  Tcmd_HELLO_DC_DS *pClientBody = (Tcmd_HELLO_DC_DS *)_tPacket.data;
-
-  memset((char *)&m_tSendPacket, 0x00, sizeof(T_PACKET));
-  m_tSendPacket.header.command = cmd_HELLO_DS_DC;
-  m_tSendPacket.header.length = 0;
-
-  ChatServer *pServer = NULL;
-  if ((pServer = dynamic_cast<ChatServer *>(m_pMainProcess)))
-  {
-    // m_iComCodeIdx = pServer->GetComCodeIdx(pClientBody->iComCode);
-  }
-
-  if (GetSocket()->Write((char *)&m_tSendPacket, PDUHEADERSIZE + m_tSendPacket.header.length) < 0)
-  {
-    CNPLog::GetInstance().Log("In ChatUser Write Error (%p)", this);
-  }
-}
-
-void ChatUser::WorkPing(const T_PACKET &_tPacket)
-{
-
-  memset((char *)&m_tSendPacket, 0x00, sizeof(T_PACKET));
-  m_tSendPacket.header.command = cmd_HEARTBEAT_DS_DC;
-  m_tSendPacket.header.length = 0;
-
-  CNPLog::GetInstance().Log("ChatUser::WorkPing(%p)", this);
-  if (GetSocket()->Write((char *)&m_tSendPacket, PDUHEADERSIZE + m_tSendPacket.header.length) < 0)
-  {
-    CNPLog::GetInstance().Log("In ChatUser Write Error (%p)", this);
-  }
-}
-
-void ChatUser::WorkGoodBye(const T_PACKET &_tPacket)
-{
-  memset((char *)&m_tSendPacket, 0x00, sizeof(T_PACKET));
-  m_tSendPacket.header.command = cmd_GOODBYE_DS_DC;
-  m_tSendPacket.header.length = 0;
-
-  CNPLog::GetInstance().Log("ChatUser::WorkGoodBye(%p)", this);
-  if (GetSocket()->Write((char *)&m_tSendPacket, PDUHEADERSIZE + m_tSendPacket.header.length) < 0)
-  {
-    CNPLog::GetInstance().Log("In ChatUser Write Error (%p)", this);
-  }
-}
-
 void ChatUser::MessageBroadcast(BroadcastMessage *message)
 {
   ChatServer *chatServer = NULL;
@@ -162,10 +115,10 @@ const int ChatUser::ExecuteCommand(Thread *_pThread)
       return -1;
     }
 
-    if (tPacket.header.command == cmd_CHAT_DS_DSM)
+    if (tPacket.header.command == cmd_CHAT_BROADCAST)
     {
       BroadcastMessage *broadcastMessage = new BroadcastMessage();
-      Tcmd_CHAT_DS_DSM *pChatPacket = (Tcmd_CHAT_DS_DSM *)tPacket.data;
+      Tcmd_CHAT_BROADCAST *pChatPacket = (Tcmd_CHAT_BROADCAST *)tPacket.data;
 
       // int messageSize = pPacketHeader->length - sizeof(uint32_t);
       int messageSize = pPacketHeader->length - sizeof(uint64_t);

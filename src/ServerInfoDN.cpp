@@ -258,34 +258,10 @@ const char* const ServerInfoDN::GetIPAddr()
   return m_pchIPAddr;
 }
 
-const char* const ServerInfoDN::GetVolName()
-{
-  return m_pchVolName;
-}
-
-const char* const ServerInfoDN::GetDirName()
-{
-  return m_pchDirName;
-}
-
 const char* const ServerInfoDN::GetManagerIpAddresses()
 {
   return m_pchManagerIpAddresses;
 }
-
-/*
-   const char* const ServerInfoDN::GetUnixSockPath()
-   {
-   return m_pchUnixSockPath;
-   }
-   */
-
-/*
-   const int ServerInfoDN::GetMessageQID()
-   {
-   return m_iMessageQ;
-   }
-   */
 
 const serverInfoMap& ServerInfoDN::GetPortMap()
 {

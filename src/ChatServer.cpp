@@ -138,16 +138,6 @@ const int ChatServer::GetDNServerPort()
   return m_pServerInfo->GetPort(SERVER_PORT);
 }
 
-const char* const ChatServer::GetVolName()
-{
-  return m_pServerInfo->GetVolName();
-}
-
-const char* const ChatServer::GetDirName()
-{
-  return m_pServerInfo->GetDirName();
-}
-
 const char* const ChatServer::GetLogFileName()
 {
   return m_pServerInfo->GetLogFileName();
@@ -193,6 +183,8 @@ ClientSocket* const ChatServer::NegotiationWithManager(string server, int port)
                                 server.c_str(), port, GetUniqId(), getpid());
 
   ClientSocket *pCSocket = new ClientSocket();
+
+  // if(pCSocket->NonBlockConnect(server.c_str(), port) < 0)
   if(pCSocket->Connect(server.c_str(), port) < 0)
   {
     CNPLog::GetInstance().Log("Error Connect to Mgr (%s)(%d)", server.c_str(), port);
@@ -362,9 +354,9 @@ void ChatServer::MessageBroadcastToManagers(BroadcastMessage *_message)
   memset((char *)&tSendPacket, 0x00, sizeof(T_PACKET));
 
   memcpy(tSendPacket.data, _message->GetMessage(), _message->GetMessageSize());
-  Tcmd_CHAT_DS_DSM *sndbody = (Tcmd_CHAT_DS_DSM *)tSendPacket.data;
+  Tcmd_CHAT_BROADCAST *sndbody = (Tcmd_CHAT_BROADCAST *)tSendPacket.data;
 
-  tSendPacket.header.command  = cmd_CHAT_DS_DSM;
+  tSendPacket.header.command  = cmd_CHAT_BROADCAST;
   tSendPacket.header.length   = _message->GetMessageSize() + sizeof(uint64_t);
   // tSendPacket.header.length   = _message->GetMessageSize() + sizeof(unsigned int);
 
@@ -470,9 +462,6 @@ void ChatServer::Run()
     ThreadManager::GetInstance()->Spawn(t);
     CNPLog::GetInstance().Log("In ChatServer Broadcaster Create (%p,%lu) ", t, t->GetThreadID());
   }
-
-// fprintf(stderr, "uniqid => (%llu)\n", m_iMacAddr*getpid());
-
 
   // ThreadTic *tTic = new ThreadTic(this);
   // ThreadManager::GetInstance()->Spawn(tTic);
@@ -586,7 +575,7 @@ void ChatServer::Run()
             if( ((ChatUser*)pClient)->GetSendPacketCount() > 0 &&
                 ((ChatUser*)pClient)->GetSendTime() < CNPUtil::GetMicroTime())
             {
-              //CNPLog::GetInstance().Log("2. In Download Server =>>(%f), (%f)", ((ChatUser*)pClient)->GetSendTime(), CNPUtil::GetMicroTime());
+              //CNPLog::GetInstance().Log("2. In Chat Server =>>(%f), (%f)", ((ChatUser*)pClient)->GetSendTime(), CNPUtil::GetMicroTime());
               m_pIOMP->DelClient(pClient);
               pClient->SetAccessTime();
               PutSendQueue(pClient);

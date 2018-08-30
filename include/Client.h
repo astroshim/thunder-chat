@@ -6,10 +6,8 @@
 #include "./ClientSocket.h"
 #include "./CircularBuff.h"
 
-//class DownloadServer;
 class Process;
 class Thread;
-//class Socket;
 
 const unsigned int MAX_ID     = 50;
 const unsigned int MAX_ENC_KEY  = 32;
@@ -21,24 +19,10 @@ class Client
 
     unsigned char   m_iState;
     ENUM_CLIENT_TYPE  m_eType;
-
-    //time_t        m_tAccessTime;    // Access time
     double        m_tAccessTime;    // Access time
-
-    /*
-       FILE      *m_pFile;
-       unsigned int  m_iClientSize;
-     */
-
-
-    /*
-       int m_iPort;
-       char m_pchIpAddr[MAX_IP_LEN];
-     */
 
   protected:
     CircularBuff  m_cCBuff;
-    //DownloadServer   *m_pDownloadServer;  
     Process   *m_pMainProcess;  
 
   public: 
@@ -53,7 +37,6 @@ class Client
     void InitCircularBuffer();
     Socket* const GetSocket();
     void SetSocketFd(const int _iFd);
-    //void SetDownloadServer(DownloadServer* const _pDownloadServer);
     void SetMainProcess(Process* const _pMainProcess);
 
     //  virtual void ExecuteCommand(int _iPacketLen)=0;
@@ -64,8 +47,6 @@ class Client
 
     // This functions are to get the data from CircularBuff
     const int   GetPacket(char* const _pchBuffer, const int _iLength);
-    //  int   GetPacket(T_PACKET *_pstPacket);
-    //  int   GetPacket(char *_pchBuffer);
 
     // set client state
     void SetState(const ENUM_CLIENT_STATE _state);
@@ -74,24 +55,12 @@ class Client
     const int   GetState(const ENUM_CLIENT_STATE _state);
     const int   GetState();
 
-    //
     const bool  IsClosed();
 
-    /*
-    // get client state
-    const ENUM_CLIENT_STATE GetState();
-
-     */
-
-    //const time_t GetAccessTime();
     const double GetAccessTime();
     void  SetAccessTime();
 
     virtual const int SendToClient(const T_PACKET* const _stSendPacket, const int _iLen);
-    //  virtual int SendToClient(char *_pchData, int _iLen);
-
-    // 
-    //  virtual int   IsValidPacket();
     const int   IsValidPacket();
 };
 

@@ -4,8 +4,6 @@
 #include "./Process.h"
 #include "./Packet.h"
 
-// #define MANAGER_PROPERTIES "./ChatManager.properties"
-
 class Client;
 #ifdef _FREEBSD
 class IOMP_KQUEUE;
@@ -36,8 +34,6 @@ class ChatManager : public Process
 #endif
 
     int m_iConnCount;
-    unsigned long long m_iMacAddr;
-    unsigned long m_iIPAddr;
     char *m_pchStatistics;
 
     /**
@@ -50,9 +46,6 @@ class ChatManager : public Process
     // ChatServer
     list<Client *> m_lstChatServer;
     pthread_mutex_t m_lockClient;
-
-    list<Tcmd_USER_CLOSE_DS_DSM *> m_lstClosed;
-    pthread_mutex_t m_lockClosed;
 
     void DeleteAllMember();
 
@@ -87,16 +80,10 @@ class ChatManager : public Process
     void PutWorkQueue(const void *const _pVoid);
     const void *const GetWorkQueue();
 
-    const unsigned int GetMacAddress();
-    const unsigned int GetIPAddress();
-
     const int PostData(const char *_pData, const char *_pchURL);
     const int PostData(const char *_pData, const char *_pchURL, const char *_pchAuth);
 
     const int SetDS(int *const _piMaxUser);
-
-    void PutClosedList(Tcmd_USER_CLOSE_DS_DSM *const _pClosedInfo);
-    void HealthCheckClosedList();
 };
 
 #endif

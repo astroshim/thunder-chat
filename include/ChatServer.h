@@ -3,8 +3,6 @@
 
 #include "./Process.h"
 
-// #define CHATSERVER_PROPERTIES "./ChatServer.properties"
-
 class Socket;
 class Client;
 #ifdef _FREEBSD
@@ -99,10 +97,6 @@ class ChatServer : public Process
     const int GetServerPort();
     void SetServerSocket(Client *_pClient);
 
-    const char *const GetVolName();
-    const char *const GetDirName();
-
-    // const char *const GetUniqId();
     const unsigned long long GetUniqId();
 
     const uint64_t GetDownloadSize(const uint32_t _nBillNo);
