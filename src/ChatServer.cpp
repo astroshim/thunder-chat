@@ -177,7 +177,7 @@ const int ChatServer::ConnectToMgr()
   int port = m_pServerInfo->GetPort(SERVER_PORT_MGR);
 
   vector<string> v = split(m_pServerInfo->GetManagerIpAddresses(), ",");
-  for (const string& server : v) {
+  for (const string& server : v) { // Using Range C++11
     CNPLog::GetInstance().Log("Connect to (%s:%d)", server.c_str(), port);
     m_lstChatManagerSocket.push_back(NegotiationWithManager(server, port));
   }
