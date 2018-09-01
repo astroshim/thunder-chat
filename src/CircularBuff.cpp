@@ -148,12 +148,12 @@ const int CircularBuff::Put(const char *const _pchBuffer, const int _iLength)
 const int CircularBuff::Get(char *const _pchBuffer, const int _iLength)
 {
 #ifdef _DEBUG
-  CNPLog::GetInstance().Log("CircularBuff::Get iLen=(%d) usedsize=(%d) Head(%d),Tail(%d), buff=(%p)",
+  CNPLog::GetInstance().Log("CircularBuff::Get getPacketSize=(%d) BufferUseBytes=(%d) Head(%d),Tail(%d), buff=(%p)",
                             _iLength, GetUsedSize(), m_iHead, m_iTail, m_pchBufferHeader);
 #endif
   if (_iLength > GetUsedSize())
   {
-    CNPLog::GetInstance().Log("CircularBuff::Get len=(%d) usedsize=(%d)", _iLength, GetUsedSize());
+    CNPLog::GetInstance().Log("CircularBuff::Get len=(%d) BufferUseBytes=(%d)", _iLength, GetUsedSize());
     return RECV_NOT_ENOUGH;
   }
 
@@ -163,7 +163,7 @@ const int CircularBuff::Get(char *const _pchBuffer, const int _iLength)
   }
   else
   {
-    int iRightLen = m_iBufferSize - m_iHead; // 600
+    int iRightLen = m_iBufferSize - m_iHead; 
 
     if (_iLength <= iRightLen)
     {

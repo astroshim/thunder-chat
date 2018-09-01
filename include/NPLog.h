@@ -17,8 +17,7 @@
 const unsigned int MAX_FILE_NAME = 256;
 const unsigned int MAX_LOGLINE_SIZE = 1024;
 
-//const unsigned int MAX_LOG_FILE_SIZE = 1000000000;  // 1 giga byte
-const unsigned int MAX_LOG_FILE_SIZE = 50000000; // 50M
+const unsigned int MAX_LOG_FILE_SIZE = 1000000000;  // 1 giga byte
 
 class CNPLog : public NonCopyable
 {

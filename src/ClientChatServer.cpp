@@ -85,19 +85,22 @@ void ClientChatServer::MessageBroadcast(const T_PACKET &_tPacket)
 
 const int ClientChatServer::ExecuteCommand(Thread *_pThread)
 {
-    CNPLog::GetInstance().Log("manager 에서 메세지 받음");
-
     T_PACKET tPacket;
     PACKET_HEADER *pPacketHeader = (PACKET_HEADER *)m_cCBuff.GetHeaderPoint();
 
     memset((char *)&tPacket, 0x00, sizeof(tPacket));
+
+#ifdef _DEBUG
+    CNPLog::GetInstance().Log("ClientChatServer::ExecuteCommand pPacketHeader->length=(%d)", 
+                            pPacketHeader->length, tPacket.header.command);
+#endif
+
     if (Client::GetPacket((char *)&tPacket, pPacketHeader->length + PDUHEADERSIZE) < 0)
     {
         CNPLog::GetInstance().Log("In ClientChatServer::ExecuteCommand() GetPacketError!");
         return -1;
     }
 
-    CNPLog::GetInstance().Log("ClientChatServer::ExecuteCommand(%p) command=(%d)", this, tPacket.header.command);
 #ifdef _DEBUG
     CNPLog::GetInstance().Log("ClientChatServer::ExecuteCommand(%p) command=(%d)", this, tPacket.header.command);
 #endif

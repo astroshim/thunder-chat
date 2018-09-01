@@ -44,7 +44,7 @@ const int Client::IsValidPacket()
    * 2018: skip because chat server doesn't need packet header
   */
 #ifdef _DEBUG
-  CNPLog::GetInstance().Log("In Client::IsValidPacket ##### UsedSize=%d ", m_cCBuff.GetUsedSize());
+  CNPLog::GetInstance().Log("In Client::IsValidPacket BufferedPacketBytes=%d ", m_cCBuff.GetUsedSize());
 #endif
   return m_cCBuff.GetUsedSize();
 
@@ -135,6 +135,7 @@ const int Client::GetPacket(char *const _pchBuffer, const int _iLength)
     return -1;
   }
 
+  CNPLog::GetInstance().Log("In Client::GetPacket 읽은 packet size = %d", iRet);
   return 0;
 }
 

@@ -369,8 +369,8 @@ void ChatServer::MessageBroadcastToManagers(BroadcastMessage *_message)
   {
     ClientSocket *socket = static_cast<ClientSocket *>(*iter);
 
-    CNPLog::GetInstance().Log("ChatServer:: 메세지를 manager로 relay from (%llu) ! size=(%d), message=(%s)", 
-                        sndbody->uniqId, tSendPacket.header.length, sndbody->message, sndbody->uniqId);
+    CNPLog::GetInstance().Log("ChatServer:: 메세지를 manager로 relay from uniqId=%llu, size=(%d), message=(%s)", 
+                        sndbody->uniqId, tSendPacket.header.length, sndbody->message);
 
     socket->Write((char *)&tSendPacket, PDUHEADERSIZE+tSendPacket.header.length);
     iter++;
