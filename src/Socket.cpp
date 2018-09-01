@@ -170,7 +170,7 @@ const int Socket::Write(const void* const _vPtr,  const size_t _n)
   {
     if( (nWritten = write(m_iFd, pchPtr, nLeft)) < 0)
     {
-      CNPLog::GetInstance().Log("Error Write errno=(%d)(%s)", errno, strerror(errno));
+      CNPLog::GetInstance().Log("Error Write errno=(%d)(%s), m_iFd=%d", errno, strerror(errno), m_iFd);
 
       if(errno == EINTR)
       {
