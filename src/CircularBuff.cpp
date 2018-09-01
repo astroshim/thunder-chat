@@ -59,10 +59,39 @@ const int CircularBuff::GetFreeSize()
   return (m_iBufferSize - m_iUseBufferSize);
 }
 
-const unsigned char *const CircularBuff::GetHeaderPoint()
+const int CircularBuff::GetHeader(char *const _pchBuffer)
 {
-  return (unsigned char *)&m_pchBufferHeader[m_iHead];
+  int packetHeaderSize = sizeof(PACKET_HEADER);
+
+  if (m_iHead < m_iTail)
+  {
+    memcpy(_pchBuffer, &m_pchBufferHeader[m_iHead], packetHeaderSize);
+  }
+  else
+  {
+    int iRightLen = m_iBufferSize - m_iHead; 
+
+    CNPLog::GetInstance().Log("CircularBuff::GetHeader 버퍼가  역전되는 상황 m_iBufferSize=%d, m_iHead=%d, rightBuffLen=%d",
+                            m_iBufferSize, m_iHead, iRightLen);
+
+    if (packetHeaderSize <= iRightLen)
+    {
+      memcpy(_pchBuffer, &m_pchBufferHeader[m_iHead], packetHeaderSize);
+    }
+    else
+    {
+      memcpy(_pchBuffer, &m_pchBufferHeader[m_iHead], iRightLen);
+      memcpy(((char *)_pchBuffer + iRightLen), m_pchBufferHeader, packetHeaderSize - iRightLen);
+    }
+  }
+
+  return 0;
 }
+
+// const unsigned char *const CircularBuff::GetHeaderPoint()
+// {
+//   return (unsigned char *)&m_pchBufferHeader[m_iHead];
+// }
 
 void CircularBuff::PrintBufferDump()
 {
@@ -164,6 +193,9 @@ const int CircularBuff::Get(char *const _pchBuffer, const int _iLength)
   else
   {
     int iRightLen = m_iBufferSize - m_iHead; 
+
+    CNPLog::GetInstance().Log("CircularBuff::Get 버퍼가  역전되는 상황 m_iBufferSize=%d, m_iHead=%d, rightBuffLen=%d",
+                            m_iBufferSize, m_iHead, iRightLen);
 
     if (_iLength <= iRightLen)
     {

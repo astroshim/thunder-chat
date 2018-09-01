@@ -45,7 +45,8 @@ class   CircularBuff
       m_iUseBufferSize = 0;
     }
 
-    const unsigned char *const GetHeaderPoint();
+    const int GetHeader(char *const _pchBuffer);
+    // const unsigned char *const GetHeaderPoint();
 
     void      PrintBufferDump();
     void      InitBuffer();

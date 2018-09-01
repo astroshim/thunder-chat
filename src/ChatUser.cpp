@@ -106,7 +106,12 @@ const int ChatUser::ExecuteCommand(Thread *_pThread)
 #endif
 
     T_PACKET tPacket;
-    PACKET_HEADER *pPacketHeader = (PACKET_HEADER *)m_cCBuff.GetHeaderPoint();
+    // PACKET_HEADER *pPacketHeader = (PACKET_HEADER *)m_cCBuff.GetHeaderPoint();
+    char packetHeader[sizeof(PACKET_HEADER)+1];
+    memset((char *)packetHeader, 0x00, sizeof(packetHeader));
+    m_cCBuff.GetHeader(packetHeader);
+    PACKET_HEADER *pPacketHeader = (PACKET_HEADER *)packetHeader;
+
 
     memset((char *)&tPacket, 0x00, sizeof(tPacket));
     if (Client::GetPacket((char *)&tPacket, pPacketHeader->length + PDUHEADERSIZE) < 0)
