@@ -396,7 +396,7 @@ void ChatServer::MessageBroadcast(BroadcastMessage *_message)
     MessageBroadcastToManagers(_message);
   }
 
-  // pthread_mutex_lock(&m_lockClient);
+  pthread_mutex_lock(&m_lockClient);
   std::list<Client*>::iterator iter = m_lstClient.begin();
   while( iter != m_lstClient.end() )
   {
@@ -413,7 +413,7 @@ void ChatServer::MessageBroadcast(BroadcastMessage *_message)
 
     iter++;
   }
-  // pthread_mutex_unlock(&m_lockClient);
+  pthread_mutex_unlock(&m_lockClient);
 }
 
 void ChatServer::Run()
