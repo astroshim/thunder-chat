@@ -30,6 +30,11 @@ void * connect_to_server(int socket_fd, struct sockaddr_in *address) {
 
 // Get message from stdin and send to server
 void * send_message(char prompt[USERNAME_BUFFER+4], int socket_fd, struct sockaddr_in *address) {
+  send(socket_fd, "hi", strlen("hi")+1, 0);
+  sleep(10);
+  printf("close client");
+  exit(0);
+  /*
   printf("%s", prompt);
   char message[MESSAGE_BUFFER];
   char final_message[MESSAGE_BUFFER+USERNAME_BUFFER+1];
@@ -44,6 +49,7 @@ void * send_message(char prompt[USERNAME_BUFFER+4], int socket_fd, struct sockad
       }
       send(socket_fd, final_message, strlen(final_message)+1, 0);
   }
+  */
 }
 
 void * receive(void * threadData) {
@@ -87,12 +93,14 @@ int main(int argc, char**argv) {
         exit(1);
     }
 
+    /*
     // Get user handle
     printf("Enter your user name: ");
     fgets(username, USERNAME_BUFFER, stdin);
     username[strlen(username) - 1] = 0; // Remove newline char from end of string
     strcpy(prompt, username);
     strcat(prompt, "> ");
+    */
 
     server_address = argv[1];
     address.sin_family = AF_INET;
