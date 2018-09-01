@@ -111,7 +111,7 @@ const int ChatUser::ExecuteCommand(Thread *_pThread)
     memset((char *)&tPacket, 0x00, sizeof(tPacket));
     if (Client::GetPacket((char *)&tPacket, pPacketHeader->length + PDUHEADERSIZE) < 0)
     {
-      CNPLog::GetInstance().Log("In ClientChatServer::ExecuteCommand() GetPacketError!");
+      CNPLog::GetInstance().Log("In ClientUser::ExecuteCommand() GetPacketError!");
       return -1;
     }
 

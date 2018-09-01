@@ -8,8 +8,6 @@ if(UNIX AND NOT APPLE)
   set(LINUX TRUE)
 endif()
 
-set(CMAKE_CXX_COMPILER "clang++")
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -std=c++11 -stdlib=libc++")
 #set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -std=c++11")
 
 #set(CMAKE_CXX_COMPILER "g++")
@@ -23,6 +21,9 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -std=c++11 -stdlib=libc++"
 
 if(LINUX)
   message(STATUS ">>> Linux")
+
+  set(CMAKE_CXX_COMPILER "g++")
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -std=c++11")
                     
   add_definitions(-D_REENTRANT -D_FILE_OFFSET_BITS=64 -D_ONESHOT -D_DEBUG)
 
@@ -67,6 +68,9 @@ if(LINUX)
   )
 else()
   message(STATUS ">>> MacOS")
+
+  set(CMAKE_CXX_COMPILER "clang++")
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -std=c++11 -stdlib=libc++")
 
   add_definitions(-D_REENTRANT -D_FILE_OFFSET_BITS=64 -D_ONESHOT -D_FREEBSD -D_DEBUG)
 

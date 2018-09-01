@@ -97,6 +97,7 @@ const int ClientChatServer::ExecuteCommand(Thread *_pThread)
         return -1;
     }
 
+    CNPLog::GetInstance().Log("ClientChatServer::ExecuteCommand(%p) command=(%d)", this, tPacket.header.command);
 #ifdef _DEBUG
     CNPLog::GetInstance().Log("ClientChatServer::ExecuteCommand(%p) command=(%d)", this, tPacket.header.command);
 #endif
