@@ -403,10 +403,10 @@ void ChatServer::MessageBroadcast(BroadcastMessage *_message)
     Client *pClient = static_cast<Client *>(*iter);
 
     if( pClient->GetType() == CLIENT_USER && pClient->GetSocket()->GetFd() != _message->GetSocketFd()) {
-      CNPLog::GetInstance().Log("ChatServer::MessageBroadCast client socket:(%d), message socket=(%d), message=(%s)",  
-                                      pClient->GetSocket()->GetFd(),
-                                      _message->GetSocketFd(),
-                                      _message->GetMessage());
+      // CNPLog::GetInstance().Log("ChatServer::MessageBroadCast client socket:(%d), message socket=(%d), message=(%s)",  
+      //                                 pClient->GetSocket()->GetFd(),
+      //                                 _message->GetSocketFd(),
+      //                                 _message->GetMessage());
 
       pClient->GetSocket()->Write(_message->GetMessage(), _message->GetMessageSize());
     }

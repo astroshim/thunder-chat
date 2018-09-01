@@ -102,11 +102,16 @@ bool ProcessManager::WatchProcess()
   {
     if (WIFEXITED(status))
     {
-      CNPLog::GetInstance().Log("1.Catch the signal. pid=(%d) status=(%d,%d)", wait_pid, WIFEXITED(status), WEXITSTATUS(status));
+      CNPLog::GetInstance().Log("Catch the signal. WIFEXITED pid=(%d) status=(%d,%d)", wait_pid, WIFEXITED(status), WEXITSTATUS(status));
     }
     else if (WIFSIGNALED(status))
     {
-      CNPLog::GetInstance().Log("2.Catch the signal. pid=(%d) status=(%d,%d)", wait_pid, status, WIFSIGNALED(status));
+      CNPLog::GetInstance().Log("Catch the signal. WIFSIGNALED pid=(%d) status=(%d,%d), core=%d", 
+                          wait_pid, status, WTERMSIG(status), WCOREDUMP(status));
+    }
+    else if (WIFSTOPPED(status))
+    {
+      CNPLog::GetInstance().Log("Catch the signal. WIFSTOPPED pid=(%d) signal=%d", wait_pid, WSTOPSIG(status));
     }
 
     /**

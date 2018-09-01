@@ -13,8 +13,8 @@ void SetLimit()
 {
   struct rlimit new_rl;
 
-  new_rl.rlim_cur = 20000;
-  new_rl.rlim_max = 20000;
+  new_rl.rlim_cur = 50000;
+  new_rl.rlim_max = 50000;
 
   if (setrlimit(RLIMIT_NOFILE, &new_rl) < 0)
   {
