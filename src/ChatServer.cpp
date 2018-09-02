@@ -396,9 +396,13 @@ void ChatServer::MessageBroadcast(BroadcastMessage *_message)
     MessageBroadcastToManagers(_message);
   }
 
+  list<Client *> lstClients;
   pthread_mutex_lock(&m_lockClient);
-  std::list<Client*>::iterator iter = m_lstClient.begin();
-  while( iter != m_lstClient.end() )
+  lstClients.insert(lstClients.end(), m_lstClient.begin(), m_lstClient.end());
+  pthread_mutex_unlock(&m_lockClient);
+
+  std::list<Client*>::iterator iter = lstClients.begin();
+  while( iter != lstClients.end() )
   {
     Client *pClient = static_cast<Client *>(*iter);
 
@@ -413,7 +417,7 @@ void ChatServer::MessageBroadcast(BroadcastMessage *_message)
 
     iter++;
   }
-  pthread_mutex_unlock(&m_lockClient);
+  // pthread_mutex_unlock(&m_lockClient);
 }
 
 void ChatServer::Run()
