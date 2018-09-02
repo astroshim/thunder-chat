@@ -135,7 +135,9 @@ const int Client::GetPacket(char *const _pchBuffer, const int _iLength)
     return -1;
   }
 
+#ifdef _DEBUG
   CNPLog::GetInstance().Log("In Client::GetPacket 읽은 packet size = %d", iRet);
+#endif
   return 0;
 }
 

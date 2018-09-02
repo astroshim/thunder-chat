@@ -283,8 +283,10 @@ const int ChatManager::SetDS(int* const _piMaxUser)
 const int ChatManager::MessageBroadcast(const T_PACKET &_tPacket)
 {
   Tcmd_CHAT_BROADCAST *pChatPacket = (Tcmd_CHAT_BROADCAST *)_tPacket.data;
+#ifdef _DEBUG
   CNPLog::GetInstance().Log("ClientChatServer::MessageBroadcast Broadcast 요청 받음 from uniqId=(%llu), length=(%d), message=(%s)", 
                               pChatPacket->uniqId, _tPacket.header.length, pChatPacket->message);
+#endif
 
   std::list<Client *>::iterator iter = m_lstChatServer.begin();
   while( iter != m_lstChatServer.end() )
@@ -292,7 +294,9 @@ const int ChatManager::MessageBroadcast(const T_PACKET &_tPacket)
     ClientChatServer *chatServer = static_cast<ClientChatServer *>(*iter);
     if( chatServer->GetUniqId() != pChatPacket->uniqId) 
     {
+#ifdef _DEBUG
       CNPLog::GetInstance().Log("message broadcasting from manager to (%llu)", chatServer->GetUniqId());
+#endif
       chatServer->GetSocket()->Write((char *)&_tPacket, PDUHEADERSIZE+_tPacket.header.length);
     }
 

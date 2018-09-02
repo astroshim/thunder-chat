@@ -370,8 +370,10 @@ void ChatServer::MessageBroadcastToManagers(BroadcastMessage *_message)
   {
     ClientSocket *socket = static_cast<ClientSocket *>(*iter);
 
+#ifdef _DEBUG
     CNPLog::GetInstance().Log("ChatServer:: 메세지를 manager로 relay from uniqId=%llu, size=(%d), message=(%s)", 
                         sndbody->uniqId, tSendPacket.header.length, sndbody->message);
+#endif
 
     socket->Write((char *)&tSendPacket, PDUHEADERSIZE+tSendPacket.header.length);
     iter++;
@@ -406,7 +408,9 @@ list<int> ChatServer::GetBroadcastTargets(BroadcastMessage *_message)
   }
   pthread_mutex_unlock(&m_lockClient);
 
+  #ifdef _DEBUG
   CNPLog::GetInstance().Log("TargetSocket size : %d", lstSocket.size());
+  #endif
   return lstSocket;
 }
 
@@ -417,24 +421,12 @@ void ChatServer::MessageBroadcast(BroadcastMessage *_message)
     MessageBroadcastToManagers(_message);
   }
 
-  // // copy broadcasting targets.
-  // list<int> lstSocket;
-  // pthread_mutex_lock(&m_lockClient);
-  // std::list<Client*>::iterator iter = m_lstClient.begin();
-  // while( iter != m_lstClient.end() )
-  // {
-  //   Client *pClient = static_cast<Client *>(*iter);
-  //   if( pClient->GetType() == CLIENT_USER && pClient->GetSocket()->GetFd() != _message->GetSocketFd()) {
-  //     lstSocket.push_back(pClient->GetSocket()->GetFd());
-  //   }
-  //   iter++;
-  // }
-  // pthread_mutex_unlock(&m_lockClient);
-
   list<int> lstSocket;
   lstSocket = GetBroadcastTargets(_message);
-  CNPLog::GetInstance().Log("Returned TargetSocket size : %d", lstSocket.size());
   // lstSocket.swap(GetBroadcastTargets(_message));
+  #ifdef _DEBUG
+  CNPLog::GetInstance().Log("Returned TargetSocket size : %d", lstSocket.size());
+  #endif
 
   // send data to clients
   std::list<int>::iterator iter2 = lstSocket.begin();
