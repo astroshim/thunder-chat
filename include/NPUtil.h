@@ -174,8 +174,7 @@ class CNPUtil
     static DWORD Encrypt(UCHAR *pbKey, DWORD dwKeySize, UCHAR *pbPlaintext, UCHAR *pbCipherText, DWORD dwHowMuch);
     ////////////////////////////////////////////////////////////////////////////////////////
 
-    // get session key
-    //static unsigned int GetSessionKey();
+    static int Write(int fd, const void* const _vPtr,  const size_t _n);
 };
 #endif
 

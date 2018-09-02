@@ -1047,5 +1047,37 @@ return iRetSessionKey;
 }
 */
 
+int CNPUtil::Write(int fd, const void* const _vPtr,  const size_t _n)
+{
+  size_t    nLeft;
+  ssize_t   nWritten;
+  const char  *pchPtr;
+
+  pchPtr  = (char *)_vPtr;
+  nLeft   = _n;
+
+  while(nLeft > 0)
+  {
+    if( (nWritten = write(fd, pchPtr, nLeft)) < 0)
+    {
+      CNPLog::GetInstance().Log("Error Write errno=(%d)(%s), fd=%d", errno, strerror(errno), fd);
+
+      if(errno == EINTR)
+      {
+        nWritten = 0;
+      }
+      else
+      {
+        return -1;
+      }
+    }
+
+    nLeft   -= nWritten;
+    pchPtr  += nWritten;
+  }
+
+  return (_n - nLeft);;
+}
+
 
 

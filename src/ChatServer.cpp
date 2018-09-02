@@ -296,20 +296,21 @@ void ChatServer::AddEPoll(Client* const _pClient, const unsigned int _uiEvents)
 void ChatServer::AcceptClient(Socket* const _pClientSocket, ENUM_CLIENT_TYPE type)
 {
   m_iConnCount++;
-  pthread_mutex_lock(&m_lockClient);
   Client *pNewClient;
   pNewClient = new ChatUser(_pClientSocket);
   pNewClient->SetType(type);
   pNewClient->SetMainProcess(this);
 
   CNPLog::GetInstance().Log("1.NewClient Client=(%p), ClientSocket=(%p)", pNewClient, _pClientSocket);
+
+  pthread_mutex_lock(&m_lockClient);
   m_lstClient.push_back((Client *)pNewClient);
+  pthread_mutex_unlock(&m_lockClient);
 
   CNPLog::GetInstance().Log("NewClient(%p) ClientSocket=(%p), FD=(%d) ",
       pNewClient,
       _pClientSocket,
       pNewClient->GetSocket()->GetFd());
-  pthread_mutex_unlock(&m_lockClient);
 
 #ifndef _ONESHOT
   if(m_pIOMP->AddClient(pNewClient, EPOLLIN) < 0)
@@ -396,11 +397,30 @@ void ChatServer::MessageBroadcast(BroadcastMessage *_message)
     MessageBroadcastToManagers(_message);
   }
 
-  list<Client *> lstClients;
+  list<int> lstSocket;
   pthread_mutex_lock(&m_lockClient);
-  lstClients.insert(lstClients.end(), m_lstClient.begin(), m_lstClient.end());
+  // lstSocket.insert(lstSocket.end(), m_lstClient.begin(), m_lstClient.end());
+
+  std::list<Client*>::iterator iter = m_lstClient.begin();
+  while( iter != m_lstClient.end() )
+  {
+    Client *pClient = static_cast<Client *>(*iter);
+    if( pClient->GetType() == CLIENT_USER && pClient->GetSocket()->GetFd() != _message->GetSocketFd()) {
+      lstSocket.push_back(pClient->GetSocket()->GetFd());
+    }
+    iter++;
+  }
   pthread_mutex_unlock(&m_lockClient);
 
+  std::list<int>::iterator iter2 = lstSocket.begin();
+  while( iter2 != lstSocket.end() )
+  {
+    int socket = static_cast<int>(*iter2);
+    CNPUtil::Write(socket, _message->GetMessage(), _message->GetMessageSize());
+    iter2++;
+  }
+
+  /*
   std::list<Client*>::iterator iter = lstClients.begin();
   while( iter != lstClients.end() )
   {
@@ -417,6 +437,7 @@ void ChatServer::MessageBroadcast(BroadcastMessage *_message)
 
     iter++;
   }
+  */
   // pthread_mutex_unlock(&m_lockClient);
 }
 
