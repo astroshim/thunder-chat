@@ -390,17 +390,11 @@ int ChatServer::RegisterManager()
   return 0;
 }
 
-void ChatServer::MessageBroadcast(BroadcastMessage *_message)
+list<int> ChatServer::GetBroadcastTargets(BroadcastMessage *_message)
 {
-  if (_message->GetMessageType() != RELAYED_MESSAGE) 
-  {
-    MessageBroadcastToManagers(_message);
-  }
-
+  // copy broadcasting targets.
   list<int> lstSocket;
   pthread_mutex_lock(&m_lockClient);
-  // lstSocket.insert(lstSocket.end(), m_lstClient.begin(), m_lstClient.end());
-
   std::list<Client*>::iterator iter = m_lstClient.begin();
   while( iter != m_lstClient.end() )
   {
@@ -412,6 +406,37 @@ void ChatServer::MessageBroadcast(BroadcastMessage *_message)
   }
   pthread_mutex_unlock(&m_lockClient);
 
+  CNPLog::GetInstance().Log("TargetSocket size : %d", lstSocket.size());
+  return lstSocket;
+}
+
+void ChatServer::MessageBroadcast(BroadcastMessage *_message)
+{
+  if (_message->GetMessageType() != RELAYED_MESSAGE) 
+  {
+    MessageBroadcastToManagers(_message);
+  }
+
+  // // copy broadcasting targets.
+  // list<int> lstSocket;
+  // pthread_mutex_lock(&m_lockClient);
+  // std::list<Client*>::iterator iter = m_lstClient.begin();
+  // while( iter != m_lstClient.end() )
+  // {
+  //   Client *pClient = static_cast<Client *>(*iter);
+  //   if( pClient->GetType() == CLIENT_USER && pClient->GetSocket()->GetFd() != _message->GetSocketFd()) {
+  //     lstSocket.push_back(pClient->GetSocket()->GetFd());
+  //   }
+  //   iter++;
+  // }
+  // pthread_mutex_unlock(&m_lockClient);
+
+  list<int> lstSocket;
+  lstSocket = GetBroadcastTargets(_message);
+  CNPLog::GetInstance().Log("Returned TargetSocket size : %d", lstSocket.size());
+  // lstSocket.swap(GetBroadcastTargets(_message));
+
+  // send data to clients
   std::list<int>::iterator iter2 = lstSocket.begin();
   while( iter2 != lstSocket.end() )
   {
@@ -421,8 +446,9 @@ void ChatServer::MessageBroadcast(BroadcastMessage *_message)
   }
 
   /*
-  std::list<Client*>::iterator iter = lstClients.begin();
-  while( iter != lstClients.end() )
+  pthread_mutex_lock(&m_lockClient);
+  std::list<Client*>::iterator iter = m_lstClient.begin();
+  while( iter != m_lstClient.end() )
   {
     Client *pClient = static_cast<Client *>(*iter);
 
@@ -437,8 +463,8 @@ void ChatServer::MessageBroadcast(BroadcastMessage *_message)
 
     iter++;
   }
+  pthread_mutex_unlock(&m_lockClient);
   */
-  // pthread_mutex_unlock(&m_lockClient);
 }
 
 void ChatServer::Run()

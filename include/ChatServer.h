@@ -104,6 +104,7 @@ class ChatServer : public Process
     const unsigned int GetBandwidth(const char _chID);
     void MessageBroadcast(BroadcastMessage *_message);
     void MessageBroadcastToManagers(BroadcastMessage *_message);
+    list<int> GetBroadcastTargets(BroadcastMessage *_message);
 };
 
 #endif
