@@ -360,7 +360,7 @@ void ChatManager::DoFork(Process *_pProcess)
   {
     return;
   }
-  if(pServerSocket->Listen(1000) < 0)
+  if(pServerSocket->Listen(10000) < 0)
   {
     return;
   }

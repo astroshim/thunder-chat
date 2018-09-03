@@ -66,7 +66,7 @@ Socket *const ServerSocket::Accept()
   iClientSocket = accept(GetFd(), (struct sockaddr *)&stClientAddr, (socklen_t *)&iAddrLength);
   if (iClientSocket < 0)
   {
-    CNPLog::GetInstance().Log("1.accept() fail error=[%d],(%s) ", errno, strerror(errno));
+    CNPLog::GetInstance().Log("accept() fail error=[%d],(%s) ", errno, strerror(errno));
     return NULL;
   }
 
