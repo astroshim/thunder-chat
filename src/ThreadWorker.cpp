@@ -61,6 +61,7 @@ void ThreadWorker::Run()
       {
         if (pClient->ExecuteCommand(this) < 0)
         {
+          CNPLog::GetInstance().Log(" BREAK? (%p)", pClient);
           break;
         }
       }

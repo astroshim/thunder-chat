@@ -41,8 +41,7 @@ void ThreadTic::Run()
   memcpy(pchLogDir, name_start, size);
   pchLogDir[size] = '\0';
 
-  strcat(pchOldLogDir, "old_log"); // jjang file
-  // zfile �� old_log�� ������� �ʴ´�.
+  strcat(pchOldLogDir, "old_log"); 
 
   while (1)
   {
