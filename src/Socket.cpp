@@ -159,6 +159,11 @@ const int Socket::Read(void* const _vPtr, const size_t _messageLengthInSocket)
 
 const int Socket::Write(const void* const _vPtr,  const size_t _n)
 {
+  if (m_iFd <= 0) {
+    CNPLog::GetInstance().Log("socket is broken %d", m_iFd);
+    return 0;
+  }
+
   size_t    nLeft;
   ssize_t   nWritten;
   const char  *pchPtr;
