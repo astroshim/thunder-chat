@@ -26,7 +26,7 @@
 #include <sys/epoll.h>
 #include <map>
 
-const unsigned int EPOLL_SIZE = 200;
+const unsigned int EPOLL_SIZE = 20000;
 
 class Client;
 class IOMP_EPoll

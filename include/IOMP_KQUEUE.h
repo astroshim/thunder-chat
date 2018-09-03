@@ -29,7 +29,7 @@
 #include <sys/event.h>
 #include <sys/time.h>
 
-const unsigned int EPOLL_SIZE = 200;
+const unsigned int EPOLL_SIZE = 20000;
 
 class Client;
 class IOMP_KQUEUE
