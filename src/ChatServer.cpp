@@ -604,7 +604,7 @@ void ChatServer::Run()
         if(tEvents[i].events & EPOLLIN)
         {
   #ifdef _DEBUG
-          CNPLog::GetInstance().Log("EPOLLIN Client %p, events=(%d)", pClient, tEvents[i].events);
+          CNPLog::GetInstance().Log("EPOLLIN Client %p, socket=(%d), events=(%d)", pClient, pClient->GetSocket()->GetFd(), tEvents[i].events);
   #endif
 
   #ifndef _ONESHOT
