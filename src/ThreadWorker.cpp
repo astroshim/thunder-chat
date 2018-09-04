@@ -82,8 +82,7 @@ void ThreadWorker::Run()
     //m_chatManager->UpdateEPoll(pClient, EV_ADD | EV_ENABLE |EV_ONESHOT);
     m_chatManager->AddEPoll(pClient, EVFILT_READ, EV_ADD | EV_ENABLE | EV_ONESHOT | EV_ERROR);
 #else
-    // m_chatManager->UpdateEPoll(pClient, EPOLLIN | EPOLLET | EPOLLONESHOT);
-    m_chatManager->UpdateEPoll(pClient, EPOLLIN | EPOLLET );
+    m_chatManager->UpdateEPoll(pClient, EPOLLIN | EPOLLET | EPOLLONESHOT);
 
 #endif
   }

@@ -149,7 +149,10 @@ const int Client::FillFromSocket()
 
   if ((iReadLen = m_cCBuff.Put(m_cSocket)) <= 0)
   {
-    return USER_CLOSE;
+#ifdef _DEBUG
+  CNPLog::GetInstance().Log("InClient::FillFromSocket(%p) USER_CLOSE, len=(%d)", this, iReadLen);
+#endif
+    // return USER_CLOSE;
   }
 
 #ifdef _DEBUG
