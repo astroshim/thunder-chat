@@ -320,7 +320,8 @@ void ChatServer::AcceptClient(Socket* const _pClientSocket, ENUM_CLIENT_TYPE typ
     #ifdef _FREEBSD
     if(m_pIOMP->AddClient(pNewClient, EVFILT_READ, EV_ADD|EV_ENABLE|EV_ONESHOT|EV_ERROR) < 0)
     #else
-    if(m_pIOMP->AddClient(pNewClient, EPOLLIN|EPOLLET|EPOLLONESHOT) < 0)
+    // if(m_pIOMP->AddClient(pNewClient, EPOLLIN|EPOLLET|EPOLLONESHOT) < 0)
+    if(m_pIOMP->AddClient(pNewClient, EPOLLIN|EPOLLET) < 0)
     #endif
 #endif
       {
@@ -604,7 +605,7 @@ void ChatServer::Run()
         if(tEvents[i].events & EPOLLIN)
         {
   #ifdef _DEBUG
-          CNPLog::GetInstance().Log("EPOLLIN Client %p, socket=(%d), events=(%d)", pClient, pClient->GetSocket()->GetFd(), tEvents[i].events);
+          CNPLog::GetInstance().Log("EPOLLIN Client %p, fd=(%d), events=(%d)", pClient, pClient->GetSocket()->GetFd(), tEvents[i].events);
   #endif
 
   #ifndef _ONESHOT

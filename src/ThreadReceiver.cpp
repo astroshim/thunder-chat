@@ -91,7 +91,8 @@ void ThreadReceiver::Run()
     #ifdef _FREEBSD
     m_pChatServer->AddEPoll(pClient, EVFILT_READ, EV_ADD | EV_ENABLE | EV_ONESHOT | EV_ERROR);
     #else
-    m_pChatServer->UpdateEPoll(pClient, EPOLLIN | EPOLLET | EPOLLONESHOT);
+    // m_pChatServer->UpdateEPoll(pClient, EPOLLIN | EPOLLET | EPOLLONESHOT);
+    m_pChatServer->UpdateEPoll(pClient, EPOLLIN | EPOLLET );
     #endif
 #endif
   }
