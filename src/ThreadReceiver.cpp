@@ -44,8 +44,7 @@ void ThreadReceiver::Run()
     {
       if (iRet == USER_CLOSE)
       {
-        CNPLog::GetInstance().Log("Close In ThreadReceiver.(%p)", pClient);
-
+        CNPLog::GetInstance().Log("Close In ThreadReceiver.(%p), fd=(%d)", pClient, pClient->GetSocket()->GetFd());
         m_pChatServer->CloseClient(pClient);
         continue;
       }
@@ -66,7 +65,7 @@ void ThreadReceiver::Run()
       while ((iPacketLen = pClient->IsValidPacket()) > 0)
       {
 #ifdef _DEBUG
-        CNPLog::GetInstance().Log("In ThreadReceiver.(%p), packetLen=(%d)", pClient, iPacketLen);
+        CNPLog::GetInstance().Log("In ThreadReceiver.(%p), fd=(%d), packetLen=(%d)", pClient, pClient->GetSocket()->GetFd(), iPacketLen);
 #endif
 
         if (pClient->ExecuteCommand(this) > 0)

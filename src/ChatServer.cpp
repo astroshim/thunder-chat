@@ -179,7 +179,7 @@ ClientSocket* const ChatServer::NegotiationWithManager(string server, int port)
 {
   m_uniqId = CNPUtil::GetUnixTime() + getpid();
 
-  CNPLog::GetInstance().Log("Trying Connect to Mgr.. (%s)(%d) from (%llu), %lu", 
+  CNPLog::GetInstance().Log("Trying Connect to Mgr.. (%s)(%d) from (%llu), pid=(%lu)", 
                                 server.c_str(), port, GetUniqId(), getpid());
 
   ClientSocket *pCSocket = new ClientSocket();
@@ -225,9 +225,7 @@ ClientSocket* const ChatServer::NegotiationWithManager(string server, int port)
   }
 
   Tcmd_HELLO_DSM_DS *pRcvBody = (Tcmd_HELLO_DSM_DS *)tHelloPacket.data;
-  CNPLog::GetInstance().Log("pRcvBody->uniqId = (%llu)", pRcvBody->uniqId); 
-  CNPLog::GetInstance().Log("pRcvBody->iMaxUser = (%d)", pRcvBody->iMaxUser); 
-  CNPLog::GetInstance().Log("pRcvBody->dHelloTime = (%d)", pRcvBody->dHelloTime); 
+  CNPLog::GetInstance().Log("pRcvBody->uniqId = (%llu), fd=(%d)", pRcvBody->uniqId, pCSocket->GetFd()); 
   SetMaxUser(pRcvBody->iMaxUser);
 
   pCSocket->SetNonBlock();
@@ -303,16 +301,17 @@ void ChatServer::AcceptClient(Socket* const _pClientSocket, ENUM_CLIENT_TYPE typ
   pNewClient->SetType(type);
   pNewClient->SetMainProcess(this);
 
-  CNPLog::GetInstance().Log("1.NewClient Client=(%p), ClientSocket=(%p)", pNewClient, _pClientSocket);
+  // CNPLog::GetInstance().Log("1.NewClient Client=(%p), ClientSocket=(%p), type=(%d)", pNewClient, _pClientSocket, type);
 
   pthread_mutex_lock(&m_lockClient);
   m_lstClient.push_back((Client *)pNewClient);
   pthread_mutex_unlock(&m_lockClient);
 
-  CNPLog::GetInstance().Log("NewClient(%p) ClientSocket=(%p), FD=(%d) ",
+  CNPLog::GetInstance().Log("NewClient(%p) ClientSocket=(%p), fd=(%d), type=(%d) ",
       pNewClient,
       _pClientSocket,
-      pNewClient->GetSocket()->GetFd());
+      pNewClient->GetSocket()->GetFd(),
+      type);
 
 #ifndef _ONESHOT
   if(m_pIOMP->AddClient(pNewClient, EPOLLIN) < 0)
@@ -374,8 +373,8 @@ void ChatServer::MessageBroadcastToManagers(BroadcastMessage *_message)
     ClientSocket *socket = static_cast<ClientSocket *>(*iter);
 
 #ifdef _DEBUG
-    CNPLog::GetInstance().Log("ChatServer:: 메세지를 manager로 relay from uniqId=%llu, size=(%d), message=(%s)", 
-                        sndbody->uniqId, tSendPacket.header.length, sndbody->message);
+    CNPLog::GetInstance().Log("ChatServer:: 메세지를 manager로 relay from uniqId=%llu, fd=(%d), size=(%d)", 
+                        sndbody->uniqId, socket->GetFd(), tSendPacket.header.length);
 #endif
 
     socket->Write((char *)&tSendPacket, PDUHEADERSIZE+tSendPacket.header.length);
@@ -411,9 +410,9 @@ list<int> ChatServer::GetBroadcastTargets(BroadcastMessage *_message)
   }
   pthread_mutex_unlock(&m_lockClient);
 
-  #ifdef _DEBUG
-  CNPLog::GetInstance().Log("TargetSocket size : %d", lstSocket.size());
-  #endif
+  // #ifdef _DEBUG
+  // CNPLog::GetInstance().Log("TargetSocket size : %d", lstSocket.size());
+  // #endif
   return lstSocket;
 }
 
@@ -427,17 +426,17 @@ void ChatServer::MessageBroadcast(BroadcastMessage *_message)
   list<int> lstSocket;
   lstSocket = GetBroadcastTargets(_message);
   // lstSocket.swap(GetBroadcastTargets(_message));
-  #ifdef _DEBUG
-  CNPLog::GetInstance().Log("Returned TargetSocket size : %d", lstSocket.size());
-  #endif
+  // #ifdef _DEBUG
+  // CNPLog::GetInstance().Log("Returned TargetSocket size : %d", lstSocket.size());
+  // #endif
 
   // send data to clients
-  std::list<int>::iterator iter2 = lstSocket.begin();
-  while( iter2 != lstSocket.end() )
+  std::list<int>::iterator iter = lstSocket.begin();
+  while( iter != lstSocket.end() )
   {
-    int socket = static_cast<int>(*iter2);
+    int socket = static_cast<int>(*iter);
     CNPUtil::Write(socket, _message->GetMessage(), _message->GetMessageSize());
-    iter2++;
+    iter++;
   }
 
   /*

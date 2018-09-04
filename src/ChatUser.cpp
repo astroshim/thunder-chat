@@ -137,9 +137,8 @@ const int ChatUser::ExecuteCommand(Thread *_pThread)
       broadcastMessage->SetMessageType(RELAYED_MESSAGE);
 
 #ifdef _DEBUG
-      CNPLog::GetInstance().Log("In ChatUser:: message (%d)(%s), buffedSize: %d",
+      CNPLog::GetInstance().Log("In ChatUser:: message fd=(%d), buffedSize=(%d)",
                                 broadcastMessage->GetSocketFd(),
-                                broadcastMessage->GetMessage(),
                                 broadcastMessage->GetMessageSize());
 #endif
       MessageBroadcast(broadcastMessage);
@@ -165,9 +164,8 @@ const int ChatUser::ExecuteCommand(Thread *_pThread)
     broadcastMessage->SetSocketFd(GetSocket()->GetFd());
 
 #ifdef _DEBUG
-    CNPLog::GetInstance().Log("In ChatUser:: message (%d)(%s), buffedSize: %d",
+    CNPLog::GetInstance().Log("In ChatUser:: message fd=(%d), buffedSize=(%d)",
                               broadcastMessage->GetSocketFd(),
-                              broadcastMessage->GetMessage(),
                               broadcastMessage->GetMessageSize());
 #endif
     MessageBroadcast(broadcastMessage);

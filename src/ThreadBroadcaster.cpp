@@ -44,7 +44,7 @@ void ThreadBroadcaster::Run()
   {
     BroadcastMessage *message = (BroadcastMessage *)m_pChatServer->GetBroadcastQueue();
 #ifdef _DEBUG
-    CNPLog::GetInstance().Log("ThreadBroadcaster message : (%s)", message->GetMessage());
+    CNPLog::GetInstance().Log("ThreadBroadcaster message : fd=(%d)", message->GetSocketFd());
 #endif
 
     m_pChatServer->MessageBroadcast(message);
