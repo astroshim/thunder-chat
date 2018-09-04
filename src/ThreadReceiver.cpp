@@ -54,7 +54,6 @@ void ThreadReceiver::Run()
     {
       int iPacketLen = 0;
 #ifndef _ONESHOT
-
       while ((iPacketLen = pClient->IsValidPacket()) > 0)
       {
         if (pClient->ExecuteCommand(this) < 0)
@@ -66,7 +65,9 @@ void ThreadReceiver::Run()
       // if (pClient->IsValidPacket() > 0)
       while ((iPacketLen = pClient->IsValidPacket()) > 0)
       {
+#ifdef _DEBUG
         CNPLog::GetInstance().Log("In ThreadReceiver.(%p), packetLen=(%d)", pClient, iPacketLen);
+#endif
 
         if (pClient->ExecuteCommand(this) > 0)
         {
@@ -87,11 +88,11 @@ void ThreadReceiver::Run()
     m_pChatServer->AddEPoll(pClient, EPOLLIN | EPOLLOUT);
 #else
     //CNPLog::GetInstance().Log("In ThreadReceiver Go To the Main (%p) fd=(%d)",  pClient, pClient->GetSocket()->GetFd());
-#ifdef _FREEBSD
+    #ifdef _FREEBSD
     m_pChatServer->AddEPoll(pClient, EVFILT_READ, EV_ADD | EV_ENABLE | EV_ONESHOT | EV_ERROR);
-#else
+    #else
     m_pChatServer->UpdateEPoll(pClient, EPOLLIN | EPOLLET | EPOLLONESHOT);
-#endif
+    #endif
 #endif
   }
 

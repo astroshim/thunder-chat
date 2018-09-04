@@ -229,6 +229,8 @@ ClientSocket* const ChatServer::NegotiationWithManager(string server, int port)
   CNPLog::GetInstance().Log("pRcvBody->iMaxUser = (%d)", pRcvBody->iMaxUser); 
   CNPLog::GetInstance().Log("pRcvBody->dHelloTime = (%d)", pRcvBody->dHelloTime); 
   SetMaxUser(pRcvBody->iMaxUser);
+
+  pCSocket->SetNonBlock();
   return pCSocket;
 }
 
@@ -315,11 +317,11 @@ void ChatServer::AcceptClient(Socket* const _pClientSocket, ENUM_CLIENT_TYPE typ
 #ifndef _ONESHOT
   if(m_pIOMP->AddClient(pNewClient, EPOLLIN) < 0)
 #else
-#ifdef _FREEBSD
+    #ifdef _FREEBSD
     if(m_pIOMP->AddClient(pNewClient, EVFILT_READ, EV_ADD|EV_ENABLE|EV_ONESHOT|EV_ERROR) < 0)
-#else
-      if(m_pIOMP->AddClient(pNewClient, EPOLLIN|EPOLLET|EPOLLONESHOT) < 0)
-#endif
+    #else
+    if(m_pIOMP->AddClient(pNewClient, EPOLLIN|EPOLLET|EPOLLONESHOT) < 0)
+    #endif
 #endif
       {
         CloseClient(pNewClient);
