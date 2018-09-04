@@ -44,6 +44,11 @@ void CircularBuff::InitBuffer()
   memset(m_pchBufferHeader, 0x00, sizeof(char) * m_iBufferSize);
 }
 
+const char* CircularBuff::GetBufferHeader()
+{
+  return m_pchBufferHeader;
+}
+
 const int CircularBuff::GetTotalSize()
 {
   return m_iBufferSize;

@@ -57,8 +57,16 @@ void ThreadWorker::Run()
     else
     {
       int iPacketLen;
+
+#ifdef _DEBUG
+      CNPLog::GetInstance().Log("In ThreadWorker.(%p), IsValidPacket", pClient);
+#endif
       while ((iPacketLen = pClient->IsValidPacket()) > 0)
       {
+#ifdef _DEBUG
+        CNPLog::GetInstance().Log("In ThreadWorker.(%p), packetLen=(%d)", pClient, iPacketLen);
+#endif
+
         if (pClient->ExecuteCommand(this) < 0)
         {
           CNPLog::GetInstance().Log(" BREAK? (%p)", pClient);

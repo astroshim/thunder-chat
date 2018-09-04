@@ -50,6 +50,7 @@ class   CircularBuff
 
     void      PrintBufferDump();
     void      InitBuffer();
+    const char* GetBufferHeader();
 
   private:
     /* Main Buffer Head */
