@@ -194,8 +194,8 @@ const int CircularBuff::Get(char *const _pchBuffer, const int _iLength)
   {
     int iRightLen = m_iBufferSize - m_iHead; 
 
-    CNPLog::GetInstance().Log("CircularBuff::Get 버퍼가  역전되는 상황 m_iBufferSize=%d, m_iHead=%d, rightBuffLen=%d",
-                            m_iBufferSize, m_iHead, iRightLen);
+    CNPLog::GetInstance().Log("CircularBuff::Get 버퍼가  역전되는 상황 (%p), m_iBufferSize=%d, m_iHead=%d, rightBuffLen=%d",
+                            m_pchBufferHeader, m_iBufferSize, m_iHead, iRightLen);
 
     if (_iLength <= iRightLen)
     {
