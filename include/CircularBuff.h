@@ -6,8 +6,7 @@
  * #include "./Packet.h" #include "./Socket.h"
  */
 
-// const unsigned int CIR_BUFSIZE = 1024000;  /* 1M bytes */
-const unsigned int CIR_BUFSIZE = 8192;  /* 8k bytes */
+const unsigned int CIR_BUFSIZE = 1024000;  
 const int NOT_ENOUGH_BUFFER = -10;
 
 class   Socket;
