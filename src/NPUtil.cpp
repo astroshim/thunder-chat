@@ -1060,7 +1060,7 @@ int CNPUtil::Write(int fd, const void* const _vPtr,  const size_t _n)
   {
     if( (nWritten = write(fd, pchPtr, nLeft)) < 0)
     {
-      CNPLog::GetInstance().Log("Error Write errno=(%d)(%s), fd=%d", errno, strerror(errno), fd);
+      CNPLog::GetInstance().Log("Error Write errno=(%d)(%s), fd=(%d)", errno, strerror(errno), fd);
 
       if(errno == EINTR)
       {

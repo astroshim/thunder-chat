@@ -253,7 +253,7 @@ void ChatManager::AddEPoll(Client* const _pClient, const unsigned int _uiEvents)
 void ChatManager::CloseClient(Client* const _pClient)
   //void ChatManager::CloseClient(Client* _pClient)
 {
-  CNPLog::GetInstance().Log("ChatManager::CloseClient ==> (%p)(%d)", _pClient, _pClient->GetSocket()->GetFd());
+  CNPLog::GetInstance().Log("ChatManager::CloseClient ==> (%p), fd=(%d)", _pClient, _pClient->GetSocket()->GetFd());
 #ifdef _FREEBSD
   m_pIOMP->DelClient(_pClient, EVFILT_READ);
 #else
@@ -284,8 +284,8 @@ const int ChatManager::MessageBroadcast(const T_PACKET &_tPacket)
 {
   Tcmd_CHAT_BROADCAST *pChatPacket = (Tcmd_CHAT_BROADCAST *)_tPacket.data;
 #ifdef _DEBUG
-  CNPLog::GetInstance().Log("ClientChatServer::MessageBroadcast Broadcast 요청 받음 from uniqId=(%llu), length=(%d), message=(%s)", 
-                              pChatPacket->uniqId, _tPacket.header.length, pChatPacket->message);
+  CNPLog::GetInstance().Log("ClientChatServer::MessageBroadcast Broadcast 요청 받음 from uniqId=(%llu), length=(%d)", 
+                              pChatPacket->uniqId, _tPacket.header.length);
 #endif
 
   std::list<Client *>::iterator iter = m_lstChatServer.begin();
@@ -295,7 +295,8 @@ const int ChatManager::MessageBroadcast(const T_PACKET &_tPacket)
     if( chatServer->GetUniqId() != pChatPacket->uniqId) 
     {
 #ifdef _DEBUG
-      CNPLog::GetInstance().Log("message broadcasting from manager to (%llu)", chatServer->GetUniqId());
+      CNPLog::GetInstance().Log("message broadcasting from manager to (%llu), fd=(%d)", 
+            chatServer->GetUniqId(), chatServer->GetSocket()->GetFd());
 #endif
       chatServer->GetSocket()->Write((char *)&_tPacket, PDUHEADERSIZE+_tPacket.header.length);
     }
@@ -531,7 +532,7 @@ void ChatManager::Run()
 #else
       if(tEvents[i].events & (EPOLLERR | EPOLLHUP))
       {
-        CNPLog::GetInstance().Log("In EPOLLERR or EPOLLHUP disconnect (%p) (%d) errno=(%d)(%s)", pClient,
+        CNPLog::GetInstance().Log("In EPOLLERR or EPOLLHUP disconnect (%p) fd=(%d) errno=(%d)(%s)", pClient,
             pClient->GetSocket()->GetFd(), errno, strerror(errno));
 
         CloseClient(pClient);
@@ -540,7 +541,7 @@ void ChatManager::Run()
       {
         //m_pIOMP->DelClient(pClient);
 #ifdef _DEBUG
-        CNPLog::GetInstance().Log("EPOLLIN Client %p, events=(%d)", pClient, tEvents[i].events);
+        CNPLog::GetInstance().Log("EPOLLIN Client %p, fd=(%d), events=(%d)", pClient, pClient->GetSocket()->GetFd(), tEvents[i].events);
 #endif
         pClient->SetAccessTime();
         PutWorkQueue(pClient);
