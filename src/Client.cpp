@@ -150,14 +150,15 @@ const int Client::FillFromSocket()
   if ((iReadLen = m_cCBuff.Put(m_cSocket)) <= 0)
   {
 #ifdef _DEBUG
-  CNPLog::GetInstance().Log("InClient::FillFromSocket(%p) USER_CLOSE, len=(%d)", this, iReadLen);
+  CNPLog::GetInstance().Log("InClient::FillFromSocket(%p) fd=(%d), USER_CLOSE, len=(%d)", 
+            this, GetSocket()->GetFd(), iReadLen);
 #endif
     // return USER_CLOSE;
   }
 
 #ifdef _DEBUG
-  CNPLog::GetInstance().Log("InClient::FillFromSocket(%p) capacity=[%d], filled=> %d ",
-                            this, m_cCBuff.GetTotalSize(), m_cCBuff.GetUsedSize());
+  CNPLog::GetInstance().Log("InClient::FillFromSocket(%p) capacity=[%d], fd=(%d), filled=> %d ",
+                            this, m_cCBuff.GetTotalSize(), GetSocket()->GetFd(), m_cCBuff.GetUsedSize());
 #endif
 
   return iReadLen;
@@ -165,6 +166,5 @@ const int Client::FillFromSocket()
 
 const int Client::SendToClient(const T_PACKET *const _stSendPacket, const int _iLen)
 {
-  //return ((Socket *)(this->GetSocket()))->Write((char *)_stSendPacket, _iLen);
   return m_cSocket->Write((char *)_stSendPacket, _iLen);
 }
