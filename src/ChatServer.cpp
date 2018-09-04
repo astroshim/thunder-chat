@@ -225,7 +225,7 @@ ClientSocket* const ChatServer::NegotiationWithManager(string server, int port)
   }
 
   Tcmd_HELLO_DSM_DS *pRcvBody = (Tcmd_HELLO_DSM_DS *)tHelloPacket.data;
-  CNPLog::GetInstance().Log("pRcvBody->uniqId = (%d)", pRcvBody->uniqId); 
+  CNPLog::GetInstance().Log("pRcvBody->uniqId = (%llu)", pRcvBody->uniqId); 
   CNPLog::GetInstance().Log("pRcvBody->iMaxUser = (%d)", pRcvBody->iMaxUser); 
   CNPLog::GetInstance().Log("pRcvBody->dHelloTime = (%d)", pRcvBody->dHelloTime); 
   SetMaxUser(pRcvBody->iMaxUser);

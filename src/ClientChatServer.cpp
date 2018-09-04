@@ -50,6 +50,8 @@ void ClientChatServer::WorkChatServerHello(const T_PACKET &_tPacket)
     tPacket.header.length = sizeof(Tcmd_HELLO_DSM_DS);
 
     sndbody->iMaxUser = iMaxUser;
+    sndbody->uniqId = pClientBody->uniqId;
+
     m_uniqId = pClientBody->uniqId;
     CNPLog::GetInstance().Log("Hello Ack to uniqId=(%llu),maxUser=(%d)", pClientBody->uniqId, iMaxUser);
 
