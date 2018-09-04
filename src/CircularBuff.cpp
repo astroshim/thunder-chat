@@ -228,8 +228,8 @@ const int CircularBuff::Put(Socket *const _pSocket)
 
   if (messageLengthInSocket > GetFreeSize())
   {
-    CNPLog::GetInstance().Log("ClientBuffer OverFlow! (%d), messageLengthInSocket=(%d), BufferFreeSize=(%d), BufferedPacketSize=(%d)", 
-                _pSocket->GetFd(), messageLengthInSocket, GetFreeSize(), m_iUseBufferSize);
+    CNPLog::GetInstance().Log("ClientBuffer OverFlow!(%p) (%d), messageLengthInSocket=(%d), BufferFreeSize=(%d), BufferedPacketSize=(%d)", 
+                m_pchBufferHeader, _pSocket->GetFd(), messageLengthInSocket, GetFreeSize(), m_iUseBufferSize);
     // buffer overflow!
     return USER_CLOSE;
 
@@ -239,8 +239,8 @@ const int CircularBuff::Put(Socket *const _pSocket)
      */
   }
 #ifdef _DEBUG
-  CNPLog::GetInstance().Log("In CircularBuff::Put(%p) messageLengthInSocket=(%d), m_iUseBufferSize=(%d), m_iHead=(%d), m_iTail=(%d)",
-                            m_pchBufferHeader, messageLengthInSocket, m_iUseBufferSize, m_iHead, m_iTail);
+  CNPLog::GetInstance().Log("In CircularBuff::Put(%p) messageLengthInSocket=(%d), BufferedPacketSize=(%d), BufferFreeSize=(%d), m_iHead=(%d), m_iTail=(%d)",
+                            m_pchBufferHeader, messageLengthInSocket, m_iUseBufferSize, GetFreeSize(), m_iHead, m_iTail);
 #endif
 
   if (m_iHead <= m_iTail)
