@@ -228,7 +228,8 @@ const int CircularBuff::Put(Socket *const _pSocket)
 
   if (messageLengthInSocket > GetFreeSize())
   {
-    CNPLog::GetInstance().Log("ClientBuffer OverFlow! (%d),messageLengthInSocket=(%d),GetFreeSize()=(%d)", _pSocket->GetFd(), messageLengthInSocket, GetFreeSize());
+    CNPLog::GetInstance().Log("ClientBuffer OverFlow! (%d), messageLengthInSocket=(%d), BufferFreeSize=(%d), BufferedPacketSize=(%d)", 
+                _pSocket->GetFd(), messageLengthInSocket, GetFreeSize(), m_iUseBufferSize);
     // buffer overflow!
     return USER_CLOSE;
 
