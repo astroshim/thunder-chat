@@ -55,8 +55,6 @@ void ThreadReceiver::Run()
       int iPacketLen = 0;
 #ifndef _ONESHOT
 
-      CNPLog::GetInstance().Log("In ThreadReceiver ifndef _ONESHOT");
-
       while ((iPacketLen = pClient->IsValidPacket()) > 0)
       {
         if (pClient->ExecuteCommand(this) < 0)
@@ -65,15 +63,13 @@ void ThreadReceiver::Run()
         }
       }
 #else
-      CNPLog::GetInstance().Log("In ThreadReceiver _ONESHOT");
-
-      if (pClient->IsValidPacket() > 0)
+      while (pClient->IsValidPacket() > 0)
       {
         if (pClient->ExecuteCommand(this) > 0)
         {
-          //CNPLog::GetInstance().Log("In ThreadReceiver Go To the Sender (%p) fd=(%d)",  pClient, pClient->GetSocket()->GetFd());
-          m_pChatServer->PutSendQueue(pClient);
-          continue;
+          CNPLog::GetInstance().Log("In ThreadReceiver Go To the Sender (%p) fd=(%d)",  pClient, pClient->GetSocket()->GetFd());
+          // m_pChatServer->PutSendQueue(pClient);
+          // continue;
         }
       }
 #endif
