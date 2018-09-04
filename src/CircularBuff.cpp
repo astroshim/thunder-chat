@@ -230,7 +230,6 @@ const int CircularBuff::Put(Socket *const _pSocket)
   {
     CNPLog::GetInstance().Log("ClientBuffer USER_CLOSE!(%p) fd=(%d), messageLengthInSocket=(%d), BufferFreeSize=(%d), BufferedPacketSize=(%d)", 
                 m_pchBufferHeader, _pSocket->GetFd(), messageLengthInSocket, GetFreeSize(), m_iUseBufferSize);
-    return 0;
     return USER_CLOSE;
   }
 
