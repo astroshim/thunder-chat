@@ -63,8 +63,11 @@ void ThreadReceiver::Run()
         }
       }
 #else
-      while (pClient->IsValidPacket() > 0)
+      // if (pClient->IsValidPacket() > 0)
+      while ((iPacketLen = pClient->IsValidPacket()) > 0)
       {
+        CNPLog::GetInstance().Log("In ThreadReceiver.(%p), packetLen=(%d)", pClient, iPacketLen);
+
         if (pClient->ExecuteCommand(this) > 0)
         {
           CNPLog::GetInstance().Log("In ThreadReceiver Go To the Sender (%p) fd=(%d)",  pClient, pClient->GetSocket()->GetFd());
