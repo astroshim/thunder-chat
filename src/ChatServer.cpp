@@ -319,8 +319,8 @@ void ChatServer::AcceptClient(Socket* const _pClientSocket, ENUM_CLIENT_TYPE typ
     #ifdef _FREEBSD
     if(m_pIOMP->AddClient(pNewClient, EVFILT_READ, EV_ADD|EV_ENABLE|EV_ONESHOT|EV_ERROR) < 0)
     #else
-    // if(m_pIOMP->AddClient(pNewClient, EPOLLIN|EPOLLET|EPOLLONESHOT) < 0)
-    if(m_pIOMP->AddClient(pNewClient, EPOLLIN|EPOLLET) < 0)
+    if(m_pIOMP->AddClient(pNewClient, EPOLLIN|EPOLLET|EPOLLONESHOT) < 0)
+    // if(m_pIOMP->AddClient(pNewClient, EPOLLIN|EPOLLET) < 0)
     #endif
 #endif
       {
@@ -608,6 +608,7 @@ void ChatServer::Run()
   #endif
 
   #ifndef _ONESHOT
+          // 감시에서 제외 시킴.
           m_pIOMP->DelClient(pClient);
   #endif
           pClient->SetAccessTime();

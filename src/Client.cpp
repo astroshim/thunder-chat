@@ -43,9 +43,9 @@ const int Client::IsValidPacket()
   /**
    * 2018: skip because chat server doesn't need packet header
   */
-#ifdef _DEBUG
-  CNPLog::GetInstance().Log("In Client::IsValidPacket buffer=(%p), BufferedPacketBytes=%d ", m_cCBuff.GetBufferHeader(), m_cCBuff.GetUsedSize());
-#endif
+// #ifdef _DEBUG
+//   CNPLog::GetInstance().Log("In Client::IsValidPacket buffer=(%p), BufferedPacketBytes=%d ", m_cCBuff.GetBufferHeader(), m_cCBuff.GetUsedSize());
+// #endif
   return m_cCBuff.GetUsedSize();
 
   /**

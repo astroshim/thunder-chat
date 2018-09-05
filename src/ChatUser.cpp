@@ -102,7 +102,8 @@ const int ChatUser::ExecuteCommand(Thread *_pThread)
                                         // this message must broadcast but not to be relayed to other managers!
   {
 #ifdef _DEBUG
-    CNPLog::GetInstance().Log("Broadcast 요청 (manager를 통해 전달해온 메세지) == client 에 broadcasting 만 하면 되는 메세지.");
+    CNPLog::GetInstance().Log("Broadcast 요청 (manager를 통해 전달해온 메세지) == client 에 broadcasting 만 하면 되는 메세지. (%p), fd=(%d)",
+                                                              this, GetSocket()->GetFd());
 #endif
 
     T_PACKET tPacket;
@@ -128,7 +129,8 @@ const int ChatUser::ExecuteCommand(Thread *_pThread)
       // int messageSize = pPacketHeader->length - sizeof(uint32_t);
       int messageSize = pPacketHeader->length - sizeof(uint64_t);
 #ifdef _DEBUG
-      CNPLog::GetInstance().Log("MESSAGE, packet_length=(%d), messageSize=(%d)(%s)", pPacketHeader->length, messageSize, pChatPacket->message);
+      CNPLog::GetInstance().Log("MESSAGE, packet_length=(%d), messageSize=(%d), client=(%p), fd=(%d)", 
+                      pPacketHeader->length, messageSize, this, GetSocket()->GetFd());
 #endif
 
       broadcastMessage->SetMessageSize(messageSize);

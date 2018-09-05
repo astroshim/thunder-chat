@@ -51,9 +51,9 @@ void ThreadReceiver::Run()
     }
     else
     {
-      int iPacketLen = 0;
+      int bufferedPacketSize = 0;
 #ifndef _ONESHOT
-      while ((iPacketLen = pClient->IsValidPacket()) > 0)
+      while ((bufferedPacketSize = pClient->IsValidPacket()) > 0)
       {
         if (pClient->ExecuteCommand(this) < 0)
         {
@@ -62,10 +62,11 @@ void ThreadReceiver::Run()
       }
 #else
       // if (pClient->IsValidPacket() > 0)
-      while ((iPacketLen = pClient->IsValidPacket()) > 0)
+      while ((bufferedPacketSize = pClient->IsValidPacket()) > 0)
       {
 #ifdef _DEBUG
-        CNPLog::GetInstance().Log("In ThreadReceiver.(%p), fd=(%d), packetLen=(%d)", pClient, pClient->GetSocket()->GetFd(), iPacketLen);
+        CNPLog::GetInstance().Log("In ThreadReceiver.(%p), fd=(%d), bufferedPacketSize=(%d)", 
+                          pClient, pClient->GetSocket()->GetFd(), bufferedPacketSize);
 #endif
 
         if (pClient->ExecuteCommand(this) > 0)
@@ -78,8 +79,8 @@ void ThreadReceiver::Run()
 #endif
 
 #ifdef _DEBUG
-      CNPLog::GetInstance().Log("In ThreadReceiver [%p]thread Client (%p) fd=(%d), iPacketLen=(%d)",
-                                this, pClient, pClient->GetSocket()->GetFd(), iPacketLen);
+      CNPLog::GetInstance().Log("In ThreadReceiver [%p]thread Client (%p) fd=(%d), bufferedPacketSize=(%d)",
+                                this, pClient, pClient->GetSocket()->GetFd(), bufferedPacketSize);
 #endif
     }
 
@@ -90,7 +91,8 @@ void ThreadReceiver::Run()
     #ifdef _FREEBSD
     m_pChatServer->AddEPoll(pClient, EVFILT_READ, EV_ADD | EV_ENABLE | EV_ONESHOT | EV_ERROR);
     #else
-    // m_pChatServer->UpdateEPoll(pClient, EPOLLIN | EPOLLET | EPOLLONESHOT);
+    // EPOLLONESHOT 일 경우는 user level 단에서 감시하도록 시켜야 함.
+    m_pChatServer->UpdateEPoll(pClient, EPOLLIN | EPOLLET | EPOLLONESHOT);
     #endif
 #endif
   }
