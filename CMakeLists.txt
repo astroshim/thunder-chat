@@ -25,7 +25,8 @@ if(LINUX)
   set(CMAKE_CXX_COMPILER "g++")
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -std=c++11")
                     
-  add_definitions(-D_REENTRANT -D_FILE_OFFSET_BITS=64 -D_USE_ONESHOT -D_DEBUG)
+  # add_definitions(-D_REENTRANT -D_FILE_OFFSET_BITS=64 -D_USE_ONESHOT -D_DEBUG)
+  add_definitions(-D_REENTRANT -D_FILE_OFFSET_BITS=64 -D_DEBUG)
 
   add_executable(ChatServer 
         MainProcess.cpp 		

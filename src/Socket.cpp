@@ -54,6 +54,7 @@ const int Socket::Read(void* const _vPtr, const size_t _messageLengthInSocket)
 {
   size_t    remainMessageLength;
   ssize_t   nRead;
+  ssize_t   nTotalReadSize = 0;
   char    *pchPtr = NULL;
 
   pchPtr = (char *)_vPtr;
@@ -79,11 +80,11 @@ const int Socket::Read(void* const _vPtr, const size_t _messageLengthInSocket)
 
     remainMessageLength   -= nRead;
     pchPtr  += nRead;
-
+    nTotalReadSize += nRead;
   }
 
   // return (_messageLengthInSocket - remainMessageLength);
-  return nRead;
+  return nTotalReadSize;
 }
 
 // const int Socket::ReadLine(void* const _vPtr, const size_t _messageLengthInSocket)
