@@ -609,10 +609,10 @@ void ChatServer::Run()
         CNPLog::GetInstance().Log("EPOLLIN Client %p, fd=(%d), events=(%d)", pClient, pClient->GetSocket()->GetFd(), tEvents[i].events);
   #endif
 
-  #ifdef _USE_LT
+  // #ifdef _USE_LT
           // 감시에서 제외 시킴.
         m_pIOMP->DelClient(pClient);
-  #endif
+  // #endif
         pClient->SetAccessTime();
         PutReceiveQueue(pClient);
       }

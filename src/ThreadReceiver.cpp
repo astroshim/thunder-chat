@@ -49,7 +49,7 @@ void ThreadReceiver::Run()
         continue;
       }
     }
-    else
+    // else
     {
       int bufferedPacketSize = 0;
 #ifdef _USE_LT
@@ -99,6 +99,8 @@ void ThreadReceiver::Run()
     #ifdef _USE_ONESHOT
     // EPOLLONESHOT 일 경우는 user level 단에서 감시하도록 시켜야 함.
     m_pChatServer->UpdateEPoll(pClient, EPOLLIN | EPOLLET | EPOLLONESHOT);
+    #else
+    m_pChatServer->AddEPoll(pClient, EPOLLIN | EPOLLET);
     #endif
   #endif
 #endif
