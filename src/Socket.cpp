@@ -192,6 +192,7 @@ const int Socket::Write(const void* const _vPtr,  const size_t _n)
     pchPtr  += nWritten;
   }
 
+  CNPLog::GetInstance().Log("socket fd=(%d) data written bytes=(%d)", m_iFd, (_n - nLeft));
   return (_n - nLeft);;
 }
 

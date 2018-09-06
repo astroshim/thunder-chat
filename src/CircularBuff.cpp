@@ -373,11 +373,6 @@ const int CircularBuff::Put(Socket *const _pSocket)
     if (m_iHead == 0)
     {
       memcpy((void *)&m_pchBufferHeader[m_iTail], readbuf, sizen); 
-      // iFree = m_iBufferSize - m_iTail;
-      // if ((iReadLen = _pSocket->Read((char *)&m_pchBufferHeader[m_iTail], messageLengthInSocket)) <= 0)
-      // {
-      //   return USER_CLOSE;
-      // }
     }
     else
     {
@@ -385,10 +380,7 @@ const int CircularBuff::Put(Socket *const _pSocket)
       if (sizen < iFree)
       {
         CNPLog::GetInstance().Log("Buffer Overflow!!!!!!!!");
-        // if ((iReadLen = _pSocket->Read((char *)&m_pchBufferHeader[m_iTail], messageLengthInSocket)) <= 0)
-        // {
-          return USER_CLOSE;
-        // }
+        return USER_CLOSE;
       }
       else
       {
@@ -401,10 +393,6 @@ const int CircularBuff::Put(Socket *const _pSocket)
   else
   {
     memcpy((void *)&m_pchBufferHeader[m_iTail], readbuf, sizen); 
-    // if ((iReadLen = _pSocket->Read((char *)&m_pchBufferHeader[m_iTail], messageLengthInSocket)) <= 0)
-    // {
-    //   return USER_CLOSE;
-    // }
   }
 
   m_iTail += sizen;
