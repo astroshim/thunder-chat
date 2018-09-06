@@ -31,7 +31,7 @@ void * connect_to_server(int socket_fd, struct sockaddr_in *address) {
 // Get message from stdin and send to server
 void * send_message(char prompt[USERNAME_BUFFER+4], int socket_fd, struct sockaddr_in *address) {
   send(socket_fd, "hi", strlen("hi")+1, 0);
-  sleep(10);
+  sleep(30);
   printf("close client");
   exit(0);
   /*

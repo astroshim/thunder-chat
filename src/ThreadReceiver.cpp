@@ -52,7 +52,7 @@ void ThreadReceiver::Run()
     else
     {
       int bufferedPacketSize = 0;
-#ifndef _ONESHOT
+#ifdef _USE_LT
       while ((bufferedPacketSize = pClient->IsValidPacket()) > 0)
       {
         if (pClient->ExecuteCommand(this) < 0)
@@ -84,16 +84,18 @@ void ThreadReceiver::Run()
 #endif
     }
 
-#ifndef _ONESHOT
+#ifdef _USE_LT
     m_pChatServer->AddEPoll(pClient, EPOLLIN | EPOLLOUT);
 #else
     //CNPLog::GetInstance().Log("In ThreadReceiver Go To the Main (%p) fd=(%d)",  pClient, pClient->GetSocket()->GetFd());
-    #ifdef _FREEBSD
+  #ifdef _FREEBSD
     m_pChatServer->AddEPoll(pClient, EVFILT_READ, EV_ADD | EV_ENABLE | EV_ONESHOT | EV_ERROR);
-    #else
+  #else
+    #ifdef _USE_ONESHOT
     // EPOLLONESHOT 일 경우는 user level 단에서 감시하도록 시켜야 함.
     m_pChatServer->UpdateEPoll(pClient, EPOLLIN | EPOLLET | EPOLLONESHOT);
     #endif
+  #endif
 #endif
   }
 

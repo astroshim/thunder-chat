@@ -313,15 +313,18 @@ void ChatServer::AcceptClient(Socket* const _pClientSocket, ENUM_CLIENT_TYPE typ
       pNewClient->GetSocket()->GetFd(),
       type);
 
-#ifndef _ONESHOT
+#ifdef _USE_LT
   if(m_pIOMP->AddClient(pNewClient, EPOLLIN) < 0)
 #else
-    #ifdef _FREEBSD
+  #ifdef _FREEBSD
     if(m_pIOMP->AddClient(pNewClient, EVFILT_READ, EV_ADD|EV_ENABLE|EV_ONESHOT|EV_ERROR) < 0)
-    #else
+  #else
+    #ifdef _USE_ONESHOT
     if(m_pIOMP->AddClient(pNewClient, EPOLLIN|EPOLLET|EPOLLONESHOT) < 0)
-    // if(m_pIOMP->AddClient(pNewClient, EPOLLIN|EPOLLET) < 0)
+    #else 
+    if(m_pIOMP->AddClient(pNewClient, EPOLLIN|EPOLLET) < 0)
     #endif
+  #endif
 #endif
       {
         CloseClient(pNewClient);
@@ -600,33 +603,32 @@ void ChatServer::Run()
         errno = 0;
         CloseClient(pClient);
       }
-      else
-        if(tEvents[i].events & EPOLLIN)
-        {
+      else if(tEvents[i].events & EPOLLIN)
+      {
   #ifdef _DEBUG
-          CNPLog::GetInstance().Log("EPOLLIN Client %p, fd=(%d), events=(%d)", pClient, pClient->GetSocket()->GetFd(), tEvents[i].events);
+        CNPLog::GetInstance().Log("EPOLLIN Client %p, fd=(%d), events=(%d)", pClient, pClient->GetSocket()->GetFd(), tEvents[i].events);
   #endif
 
-  #ifndef _ONESHOT
+  #ifdef _USE_LT
           // 감시에서 제외 시킴.
-          m_pIOMP->DelClient(pClient);
+        m_pIOMP->DelClient(pClient);
   #endif
+        pClient->SetAccessTime();
+        PutReceiveQueue(pClient);
+      }
+
+  #ifdef _USE_LT
+      else if(tEvents[i].events & EPOLLOUT)
+      {
+        if( ((ChatUser*)pClient)->GetSendPacketCount() > 0 &&
+            ((ChatUser*)pClient)->GetSendTime() < CNPUtil::GetMicroTime())
+        {
+          //CNPLog::GetInstance().Log("2. In Chat Server =>>(%f), (%f)", ((ChatUser*)pClient)->GetSendTime(), CNPUtil::GetMicroTime());
+          m_pIOMP->DelClient(pClient);
           pClient->SetAccessTime();
-          PutReceiveQueue(pClient);
+          PutSendQueue(pClient);
         }
-  #ifndef _ONESHOT
-        else
-          if(tEvents[i].events & EPOLLOUT)
-          {
-            if( ((ChatUser*)pClient)->GetSendPacketCount() > 0 &&
-                ((ChatUser*)pClient)->GetSendTime() < CNPUtil::GetMicroTime())
-            {
-              //CNPLog::GetInstance().Log("2. In Chat Server =>>(%f), (%f)", ((ChatUser*)pClient)->GetSendTime(), CNPUtil::GetMicroTime());
-              m_pIOMP->DelClient(pClient);
-              pClient->SetAccessTime();
-              PutSendQueue(pClient);
-            }
-          }
+      }
   #endif
 
 #endif

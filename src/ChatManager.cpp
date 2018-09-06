@@ -480,12 +480,16 @@ void ChatManager::Run()
 #ifdef _FREEBSD
             if(m_pIOMP->AddClient(pNewClient, EVFILT_READ, EV_ADD|EV_ENABLE|EV_ONESHOT|EV_ERROR) < 0)
 #else
+            #ifdef _USE_ONESHOT
             if(m_pIOMP->AddClient(pNewClient, EPOLLIN|EPOLLET|EPOLLONESHOT) < 0)
+            #else
+            if(m_pIOMP->AddClient(pNewClient, EPOLLIN|EPOLLET) < 0)
+            #endif
 #endif
-              {
-                delete pNewClient;
-                continue;
-              }
+            {
+              delete pNewClient;
+              continue;
+            }
 
             pNewClient->SetState(STATE_WAIT);
             pNewClient->SetMainProcess(this);
