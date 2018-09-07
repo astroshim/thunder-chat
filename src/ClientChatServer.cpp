@@ -73,7 +73,7 @@ void ClientChatServer::WorkDSMPing(const T_PACKET &_tPacket)
 
 void ClientChatServer::MessageBroadcast(const T_PACKET &_tPacket)
 {
-    Tcmd_CHAT_BROADCAST *pChatPacket = (Tcmd_CHAT_BROADCAST *)_tPacket.data;
+    // Tcmd_CHAT_BROADCAST *pChatPacket = (Tcmd_CHAT_BROADCAST *)_tPacket.data;
     ChatManager *pManager = NULL;
     if ((pManager = dynamic_cast<ChatManager *>(m_pMainProcess)))
     {

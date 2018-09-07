@@ -359,7 +359,6 @@ void ChatServer::MessageBroadcastToManagers(BroadcastMessage *_message)
   T_PACKET tSendPacket;
   memset((char *)&tSendPacket, 0x00, sizeof(T_PACKET));
 
-  memcpy(tSendPacket.data, _message->GetMessage(), _message->GetMessageSize());
   Tcmd_CHAT_BROADCAST *sndbody = (Tcmd_CHAT_BROADCAST *)tSendPacket.data;
 
   tSendPacket.header.command  = cmd_CHAT_BROADCAST;

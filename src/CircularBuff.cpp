@@ -366,7 +366,7 @@ const int CircularBuff::Put(Socket *const _pSocket)
   while(1) { 
     memset(readbuf, 0x00, sizeof(readbuf));
     readn = read (_pSocket->GetFd(), readbuf, 256); 
-    if (readn < 0 ) { 
+    if (readn <= 0 ) { 
       if (EAGAIN == errno ) { 
         CNPLog::GetInstance().Log("EAGAIN!!!!!!!! sizen=(%d)", sizen);
         break; 
