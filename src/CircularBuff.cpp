@@ -353,8 +353,8 @@ const int CircularBuff::Put(Socket *const _pSocket)
   char readbuf[256] = {'\0'}; 
 
   memset(buf_in, 0x00, sizeof(buf_in));
-  memset(readbuf, 0x00, sizeof(readbuf));
   while(1) { 
+    memset(readbuf, 0x00, sizeof(readbuf));
     readn = read (_pSocket->GetFd(), readbuf, 256); 
     if (readn < 0 ) { 
       if (EAGAIN == errno ) { 
@@ -379,7 +379,7 @@ const int CircularBuff::Put(Socket *const _pSocket)
   {
     if (m_iHead == 0)
     {
-      memcpy((void *)&m_pchBufferHeader[m_iTail], buf_in, sizen); 
+      memcpy((void *)m_pchBufferHeader[m_iTail], buf_in, sizen); 
     }
     else
     {
@@ -392,15 +392,15 @@ const int CircularBuff::Put(Socket *const _pSocket)
       }
       else
       {
-        memcpy((void *)&m_pchBufferHeader[m_iTail], buf_in, iFree); 
-        memcpy((void *)&m_pchBufferHeader, buf_in, sizen - iFree); 
+        memcpy((void *)m_pchBufferHeader[m_iTail], buf_in, iFree); 
+        memcpy((void *)m_pchBufferHeader, buf_in, sizen - iFree); 
         // iReadLen += iTmp;
       }
     }
   }
   else
   {
-    memcpy((void *)&m_pchBufferHeader[m_iTail], buf_in, sizen); 
+    memcpy((void *)m_pchBufferHeader[m_iTail], buf_in, sizen); 
   }
 
   m_iTail += sizen;
