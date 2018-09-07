@@ -394,7 +394,7 @@ const int CircularBuff::Put(Socket *const _pSocket)
 
       if (sizen <= iFree)
       {
-        memcpy(&m_pchBufferHeader[m_iTail], _pchBuffer, sizen);
+        memcpy(&m_pchBufferHeader[m_iTail], buf_in, sizen);
       }
       else
       {
