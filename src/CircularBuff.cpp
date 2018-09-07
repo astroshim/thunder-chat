@@ -377,9 +377,10 @@ const int CircularBuff::Put(Socket *const _pSocket)
     else
     {
       iFree = m_iBufferSize - m_iTail;
-      if (sizen < iFree)
+      if (sizen > iFree)
       {
-        CNPLog::GetInstance().Log("Buffer Overflow!!!!!!!! iFree=(%d), sizen=(%d)", iFree, sizen);
+        CNPLog::GetInstance().Log("Buffer Overflow!!!!!!!! iFree=(%d), sizen=(%d), head=(%d), tail=(%d)", 
+                                      iFree, sizen, m_iHead, m_iTail);
         return USER_CLOSE;
       }
       else
