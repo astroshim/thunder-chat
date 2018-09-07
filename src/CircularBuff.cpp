@@ -374,6 +374,9 @@ const int CircularBuff::Put(Socket *const _pSocket)
     memcpy(buf_in, readbuf, readn); 
   } 
 
+  return Put(buf_in, sizen);
+
+/*
   if (m_iHead <= m_iTail)
   {
     if (m_iHead == 0)
@@ -420,5 +423,6 @@ const int CircularBuff::Put(Socket *const _pSocket)
 #ifdef _DEBUG
 #endif
   return sizen;
+  */
 }
 #endif
