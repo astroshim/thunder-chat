@@ -83,8 +83,12 @@ void ThreadWorker::Run()
     m_chatManager->AddEPoll(pClient, EVFILT_READ, EV_ADD | EV_ENABLE | EV_ONESHOT | EV_ERROR);
 #else
     #ifdef _USE_ONESHOT
+    // EPOLLONESHOT 일 경우는 user level 단에서 감시하도록 시켜야 함.
     m_chatManager->UpdateEPoll(pClient, EPOLLIN | EPOLLET | EPOLLONESHOT);
+    #else
+    m_chatManager->AddEPoll(pClient, EPOLLIN | EPOLLET);
     #endif
+
 #endif
   }
 

@@ -49,7 +49,7 @@ void ThreadReceiver::Run()
         continue;
       }
     }
-    // else
+    else
     {
       int bufferedPacketSize = 0;
 #ifdef _USE_LT
