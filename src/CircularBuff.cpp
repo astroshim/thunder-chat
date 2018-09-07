@@ -355,7 +355,7 @@ const int CircularBuff::Put(Socket *const _pSocket)
     readn = read (_pSocket->GetFd(), readbuf, 1024); 
     if (readn < 0 ) { 
       if (EAGAIN == errno ) { 
-        CNPLog::GetInstance().Log("EAGAIN!!!!!!!!");
+        CNPLog::GetInstance().Log("EAGAIN!!!!!!!! sizen=(%d)", sizen);
         break; 
       } 
 
@@ -379,7 +379,7 @@ const int CircularBuff::Put(Socket *const _pSocket)
       iFree = m_iBufferSize - m_iTail;
       if (sizen < iFree)
       {
-        CNPLog::GetInstance().Log("Buffer Overflow!!!!!!!!");
+        CNPLog::GetInstance().Log("Buffer Overflow!!!!!!!! iFree=(%d), sizen=(%d)", iFree, sizen);
         return USER_CLOSE;
       }
       else
