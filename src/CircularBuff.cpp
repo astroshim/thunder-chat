@@ -68,7 +68,10 @@ const int CircularBuff::GetHeader(char *const _pchBuffer)
 {
   int packetHeaderSize = sizeof(PACKET_HEADER);
 
-  if (m_iHead <= m_iTail + packetHeaderSize)
+  CNPLog::GetInstance().Log("CircularBuff::GetHeader packetHeaderSize=%d, m_iHead=%d, m_iTail=%d",
+                            packetHeaderSize, m_iHead, m_iTail);
+
+  if (m_iHead <= (m_iTail + packetHeaderSize))
   {
     memcpy(_pchBuffer, &m_pchBufferHeader[m_iHead], packetHeaderSize);
   }

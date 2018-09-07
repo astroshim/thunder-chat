@@ -106,7 +106,6 @@ const int ChatUser::ExecuteCommand(Thread *_pThread)
                                                               this, GetSocket()->GetFd());
 #endif
 
-    T_PACKET tPacket;
     // PACKET_HEADER *pPacketHeader = (PACKET_HEADER *)m_cCBuff.GetHeaderPoint();
     char packetHeader[sizeof(PACKET_HEADER)+1];
     memset((char *)packetHeader, 0x00, sizeof(packetHeader));
@@ -114,6 +113,7 @@ const int ChatUser::ExecuteCommand(Thread *_pThread)
     PACKET_HEADER *pPacketHeader = (PACKET_HEADER *)packetHeader;
 
 
+    T_PACKET tPacket;
     memset((char *)&tPacket, 0x00, sizeof(tPacket));
     if (Client::GetPacket((char *)&tPacket, pPacketHeader->length + PDUHEADERSIZE) < 0)
     {
@@ -126,7 +126,6 @@ const int ChatUser::ExecuteCommand(Thread *_pThread)
       BroadcastMessage *broadcastMessage = new BroadcastMessage();
       Tcmd_CHAT_BROADCAST *pChatPacket = (Tcmd_CHAT_BROADCAST *)tPacket.data;
 
-      // int messageSize = pPacketHeader->length - sizeof(uint32_t);
       int messageSize = pPacketHeader->length - sizeof(uint64_t);
 #ifdef _DEBUG
       CNPLog::GetInstance().Log("MESSAGE, packet_length=(%d), messageSize=(%d), client=(%p), fd=(%d)", 
@@ -153,7 +152,6 @@ const int ChatUser::ExecuteCommand(Thread *_pThread)
     ChatServer *pServer = dynamic_cast<ChatServer *>(m_pMainProcess);
     CNPLog::GetInstance().Log("ChatUser::ExecuteCommand pServer=(%p)", pServer);
 #endif
-
     BroadcastMessage *broadcastMessage = new BroadcastMessage();
 
     broadcastMessage->SetMessageSize(m_cCBuff.GetUsedSize());

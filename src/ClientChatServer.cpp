@@ -87,20 +87,19 @@ void ClientChatServer::MessageBroadcast(const T_PACKET &_tPacket)
 
 const int ClientChatServer::ExecuteCommand(Thread *_pThread)
 {
-    T_PACKET tPacket;
     // PACKET_HEADER *pPacketHeader = (PACKET_HEADER *)m_cCBuff.GetHeaderPoint();
-    char packetHeader[sizeof(PACKET_HEADER)+1];
-    memset((char *)packetHeader, 0x00, sizeof(packetHeader)+1);
+    char packetHeader[PDUHEADERSIZE+1];
+    memset((char *)packetHeader, 0x00, PDUHEADERSIZE+1);
     m_cCBuff.GetHeader(packetHeader);
     PACKET_HEADER *pPacketHeader = (PACKET_HEADER *)packetHeader;
 
-    memset((char *)&tPacket, 0x00, sizeof(tPacket));
-
 #ifdef _DEBUG
-    CNPLog::GetInstance().Log("ClientChatServer::ExecuteCommand pPacketHeader->length=(%d)", 
-                            pPacketHeader->length, tPacket.header.command);
+    CNPLog::GetInstance().Log("ClientChatServer::ExecuteCommand packet length=(%d), command=(%d)", 
+                            pPacketHeader->length, pPacketHeader->command);
 #endif
 
+    T_PACKET tPacket;
+    memset((char *)&tPacket, 0x00, sizeof(tPacket));
     if (Client::GetPacket((char *)&tPacket, pPacketHeader->length + PDUHEADERSIZE) < 0)
     {
         CNPLog::GetInstance().Log("In ClientChatServer::ExecuteCommand() GetPacketError!");
