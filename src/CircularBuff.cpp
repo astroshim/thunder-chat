@@ -366,6 +366,8 @@ const int CircularBuff::Put(Socket *const _pSocket)
       CNPLog::GetInstance().Log("size is big!!!!!!!! sizen=(%d)", sizen);
       return USER_CLOSE;
     } 
+
+    CNPLog::GetInstance().Log("readn=(%d)", readn);
     memcpy(buf_in, readbuf, readn); 
   } 
   CNPLog::GetInstance().Log("buf_in=(%s)", buf_in);
