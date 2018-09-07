@@ -368,6 +368,7 @@ const int CircularBuff::Put(Socket *const _pSocket)
     } 
     memcpy(buf_in, readbuf, readn); 
   } 
+  CNPLog::GetInstance().Log("buf_in=(%s)", buf_in);
 
   if (m_iHead <= m_iTail)
   {
@@ -405,9 +406,9 @@ const int CircularBuff::Put(Socket *const _pSocket)
   }
   m_iUseBufferSize += sizen;
 
-#ifdef _DEBUG
   CNPLog::GetInstance().Log("In CircularBuff::Put Leave sizen=(%d), m_iUseBufferSize=(%d), m_iHead=(%d), m_iTail=(%d)",
                             sizen, m_iUseBufferSize, m_iHead, m_iTail);
+#ifdef _DEBUG
 #endif
   return sizen;
 }
