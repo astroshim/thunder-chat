@@ -68,7 +68,7 @@ const int CircularBuff::GetHeader(char *const _pchBuffer)
 {
   int packetHeaderSize = sizeof(PACKET_HEADER);
 
-  if (m_iHead < m_iTail)
+  if (m_iHead <= m_iTail + packetHeaderSize)
   {
     memcpy(_pchBuffer, &m_pchBufferHeader[m_iHead], packetHeaderSize);
   }
@@ -109,7 +109,7 @@ void CircularBuff::Resize()
 {
   char *pchNewBuffer = new char[(m_iBufferSize + CIR_BUFSIZE) + 1];
 
-  if (m_iHead < m_iTail)
+  if (m_iHead <= m_iTail)
   {
     memcpy(pchNewBuffer, &m_pchBufferHeader[m_iHead], (m_iTail - m_iHead));
   }
@@ -140,7 +140,7 @@ const int CircularBuff::Put(const char *const _pchBuffer, const int _iLength)
 
   int iFree = 0;
 
-  if (m_iHead <= m_iTail)
+  if (m_iHead <= m_iTail + _iLength)
   {
     if (m_iHead == 0)
     {
@@ -191,7 +191,7 @@ const int CircularBuff::Get(char *const _pchBuffer, const int _iLength)
     return RECV_NOT_ENOUGH;
   }
 
-  if (m_iHead < m_iTail)
+  if (m_iHead <= (m_iTail + _iLength))
   {
     memcpy(_pchBuffer, &m_pchBufferHeader[m_iHead], _iLength);
   }

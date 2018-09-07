@@ -90,7 +90,7 @@ const int ClientChatServer::ExecuteCommand(Thread *_pThread)
     T_PACKET tPacket;
     // PACKET_HEADER *pPacketHeader = (PACKET_HEADER *)m_cCBuff.GetHeaderPoint();
     char packetHeader[sizeof(PACKET_HEADER)+1];
-    memset((char *)packetHeader, 0x00, sizeof(packetHeader));
+    memset((char *)packetHeader, 0x00, sizeof(packetHeader)+1);
     m_cCBuff.GetHeader(packetHeader);
     PACKET_HEADER *pPacketHeader = (PACKET_HEADER *)packetHeader;
 
