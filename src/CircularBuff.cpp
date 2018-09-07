@@ -231,7 +231,71 @@ const int CircularBuff::Get(char *const _pchBuffer, const int _iLength)
   return _iLength;
 }
 
-#if _USE_LT
+#if _USE_ET
+const int CircularBuff::Put(Socket *const _pSocket)
+{
+  /*
+  int messageLengthInSocket = _pSocket->Available();
+
+  if (messageLengthInSocket <= 0)
+  {
+    CNPLog::GetInstance().Log("ClientBuffer USER_CLOSE!(%p) fd=(%d), messageLengthInSocket=(%d), BufferFreeSize=(%d), BufferedPacketSize=(%d)", 
+                m_pchBufferHeader, _pSocket->GetFd(), messageLengthInSocket, GetFreeSize(), m_iUseBufferSize);
+    return USER_CLOSE;
+  }
+
+  if (messageLengthInSocket > GetFreeSize())
+  {
+    CNPLog::GetInstance().Log("ClientBuffer OverFlow!(%p) fd=(%d), messageLengthInSocket=(%d), BufferFreeSize=(%d), BufferedPacketSize=(%d)", 
+                m_pchBufferHeader, _pSocket->GetFd(), messageLengthInSocket, GetFreeSize(), m_iUseBufferSize);
+    // buffer overflow!
+    return USER_CLOSE;
+
+    //  need resize?
+    //  Resize();
+  }
+
+#ifdef _DEBUG
+  CNPLog::GetInstance().Log("In CircularBuff::Put(%p) fd=(%d), messageLengthInSocket=(%d), BufferedPacketSize=(%d), BufferFreeSize=(%d), m_iHead=(%d), m_iTail=(%d)",
+                            m_pchBufferHeader, _pSocket->GetFd(), messageLengthInSocket, m_iUseBufferSize, GetFreeSize(), m_iHead, m_iTail);
+#endif
+  */
+
+  int readn;
+  int sizen = 0; 
+  char buf_in[1024000] = {'\0'}; 
+  char readbuf[256] = {'\0'}; 
+
+  memset(buf_in, 0x00, sizeof(buf_in));
+  while(1) { 
+    memset(readbuf, 0x00, sizeof(readbuf));
+    readn = read (_pSocket->GetFd(), readbuf, 256); 
+    if (readn <= 0 ) { 
+      if (EAGAIN == errno ) { 
+        CNPLog::GetInstance().Log("EAGAIN!!!!!!!! sizen=(%d)", sizen);
+        break; 
+      } 
+      return USER_CLOSE;
+    } 
+    if (sizen >= 1024000) { 
+      CNPLog::GetInstance().Log("size is big!!!!!!!! sizen=(%d)", sizen);
+      return USER_CLOSE;
+    } 
+
+    CNPLog::GetInstance().Log("readn=(%d)", readn);
+    memcpy(buf_in+sizen, readbuf, readn); 
+    sizen += readn; 
+  } 
+
+  if (sizen == 0) {
+    return USER_CLOSE;
+  }
+
+  return Put(buf_in, sizen);
+}
+
+#else
+
 const int CircularBuff::Put(Socket *const _pSocket)
 {
   int iReadLen = 0, iFree;
@@ -325,117 +389,4 @@ const int CircularBuff::Put(Socket *const _pSocket)
 #endif
   return iReadLen;
 }
-#else
-
-const int CircularBuff::Put(Socket *const _pSocket)
-{
-  int iReadLen = 0, iFree;
-  /*
-  int messageLengthInSocket = _pSocket->Available();
-
-  if (messageLengthInSocket <= 0)
-  {
-    CNPLog::GetInstance().Log("ClientBuffer USER_CLOSE!(%p) fd=(%d), messageLengthInSocket=(%d), BufferFreeSize=(%d), BufferedPacketSize=(%d)", 
-                m_pchBufferHeader, _pSocket->GetFd(), messageLengthInSocket, GetFreeSize(), m_iUseBufferSize);
-    return USER_CLOSE;
-  }
-
-  if (messageLengthInSocket > GetFreeSize())
-  {
-    CNPLog::GetInstance().Log("ClientBuffer OverFlow!(%p) fd=(%d), messageLengthInSocket=(%d), BufferFreeSize=(%d), BufferedPacketSize=(%d)", 
-                m_pchBufferHeader, _pSocket->GetFd(), messageLengthInSocket, GetFreeSize(), m_iUseBufferSize);
-    // buffer overflow!
-    return USER_CLOSE;
-
-    //  need resize?
-    //  Resize();
-  }
-
-#ifdef _DEBUG
-  CNPLog::GetInstance().Log("In CircularBuff::Put(%p) fd=(%d), messageLengthInSocket=(%d), BufferedPacketSize=(%d), BufferFreeSize=(%d), m_iHead=(%d), m_iTail=(%d)",
-                            m_pchBufferHeader, _pSocket->GetFd(), messageLengthInSocket, m_iUseBufferSize, GetFreeSize(), m_iHead, m_iTail);
-#endif
-  */
-
-  int readn;
-  int sizen = 0; 
-  char buf_in[1024000] = {'\0'}; 
-  char readbuf[256] = {'\0'}; 
-
-  memset(buf_in, 0x00, sizeof(buf_in));
-  while(1) { 
-    memset(readbuf, 0x00, sizeof(readbuf));
-    readn = read (_pSocket->GetFd(), readbuf, 256); 
-    if (readn <= 0 ) { 
-      if (EAGAIN == errno ) { 
-        CNPLog::GetInstance().Log("EAGAIN!!!!!!!! sizen=(%d)", sizen);
-        break; 
-      } 
-      return USER_CLOSE;
-    } 
-    if (sizen >= 1024000) { 
-      CNPLog::GetInstance().Log("size is big!!!!!!!! sizen=(%d)", sizen);
-      return USER_CLOSE;
-    } 
-
-    CNPLog::GetInstance().Log("readn=(%d)", readn);
-    memcpy(buf_in+sizen, readbuf, readn); 
-    sizen += readn; 
-  } 
-
-  if (sizen == 0) {
-    return USER_CLOSE;
-  }
-
-  return Put(buf_in, sizen);
-
-/*
-  if (m_iHead <= m_iTail)
-  {
-    if (m_iHead == 0)
-    {
-      iFree = m_iBufferSize - m_iTail;
-      memcpy((void *)&m_pchBufferHeader[m_iTail], buf_in, sizen); 
-    }
-    else
-    {
-      iFree = m_iBufferSize - m_iTail;
-      if (sizen > iFree)
-      {
-        CNPLog::GetInstance().Log("Buffer Overflow!!!!!!!! iFree=(%d), sizen=(%d), head=(%d), tail=(%d)", 
-                                      iFree, sizen, m_iHead, m_iTail);
-        return USER_CLOSE;
-      }
-
-      if (sizen <= iFree)
-      {
-        memcpy(&m_pchBufferHeader[m_iTail], buf_in, sizen);
-      }
-      else
-      {
-        memcpy((void *)&m_pchBufferHeader[m_iTail], buf_in, iFree); 
-        memcpy((void *)&m_pchBufferHeader, buf_in+iFree, sizen - iFree); 
-      }
-    }
-  }
-  else
-  {
-    memcpy((void *)&m_pchBufferHeader[m_iTail], buf_in, sizen); 
-  }
-
-  m_iTail += sizen;
-
-  if (m_iBufferSize <= m_iTail)
-  {
-    m_iTail -= m_iBufferSize;
-  }
-  m_iUseBufferSize += sizen;
-
-  CNPLog::GetInstance().Log("In CircularBuff::Put Leave sizen=(%d), m_iUseBufferSize=(%d), m_iHead=(%d), m_iTail=(%d)",
-                            sizen, m_iUseBufferSize, m_iHead, m_iTail);
-#ifdef _DEBUG
-#endif
-  return sizen;
-  */
-}
-#endif
+#endif 

@@ -313,23 +313,33 @@ void ChatServer::AcceptClient(Socket* const _pClientSocket, ENUM_CLIENT_TYPE typ
       pNewClient->GetSocket()->GetFd(),
       type);
 
-#ifdef _USE_LT
-  if(m_pIOMP->AddClient(pNewClient, EPOLLIN) < 0)
-#else
-  #ifdef _FREEBSD
-    if(m_pIOMP->AddClient(pNewClient, EVFILT_READ, EV_ADD|EV_ENABLE|EV_ONESHOT|EV_ERROR) < 0)
-  #else
-    #ifdef _USE_ONESHOT
-    if(m_pIOMP->AddClient(pNewClient, EPOLLIN|EPOLLET|EPOLLONESHOT) < 0)
-    #else 
-    if(m_pIOMP->AddClient(pNewClient, EPOLLIN|EPOLLET) < 0)
-    #endif
-  #endif
+  unsigned short flags = 0;
+
+#ifdef _FREEBSD
+  flags = EV_ADD|EV_ENABLE|EV_ONESHOT|EV_ERROR;
 #endif
-      {
-        CloseClient(pNewClient);
-        return;
-      }
+
+#ifdef _USE_LT
+  flags = EPOLLIN;
+#endif
+
+#ifdef _USE_ET
+  flags = EPOLLIN|EPOLLET;
+#endif
+
+#ifdef _USE_ONESHOT
+  flags |= EPOLLONESHOT;
+#endif
+
+#ifdef _FREEBSD
+  if(m_pIOMP->AddClient(pNewClient, EVFILT_READ, flags) < 0)
+#else
+  if(m_pIOMP->AddClient(pNewClient, flags) < 0)
+#endif
+  {
+    CloseClient(pNewClient);
+    return;
+  }
 }
 
 void ChatServer::CloseClient(Client* const _pClient)
@@ -608,10 +618,10 @@ void ChatServer::Run()
         CNPLog::GetInstance().Log("EPOLLIN Client %p, fd=(%d), events=(%d)", pClient, pClient->GetSocket()->GetFd(), tEvents[i].events);
   #endif
 
-  // #ifdef _USE_LT
+  #ifndef _USE_ONESHOT
           // 감시에서 제외 시킴.
         m_pIOMP->DelClient(pClient);
-  // #endif
+  #endif
         pClient->SetAccessTime();
         PutReceiveQueue(pClient);
       }
@@ -619,8 +629,7 @@ void ChatServer::Run()
   #ifdef _USE_LT
       else if(tEvents[i].events & EPOLLOUT)
       {
-        if( ((ChatUser*)pClient)->GetSendPacketCount() > 0 &&
-            ((ChatUser*)pClient)->GetSendTime() < CNPUtil::GetMicroTime())
+        if( ((ChatUser*)pClient)->GetSendPacketCount() > 0 )
         {
           //CNPLog::GetInstance().Log("2. In Chat Server =>>(%f), (%f)", ((ChatUser*)pClient)->GetSendTime(), CNPUtil::GetMicroTime());
           m_pIOMP->DelClient(pClient);
