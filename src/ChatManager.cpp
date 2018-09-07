@@ -543,7 +543,9 @@ void ChatManager::Run()
       }
       else if(tEvents[i].events & EPOLLIN)
       {
-        //m_pIOMP->DelClient(pClient);
+        #ifndef _USE_ONESHOT
+        m_pIOMP->DelClient(pClient);
+        #endif
 #ifdef _DEBUG
         CNPLog::GetInstance().Log("EPOLLIN Client %p, fd=(%d), events=(%d)", pClient, pClient->GetSocket()->GetFd(), tEvents[i].events);
 #endif
