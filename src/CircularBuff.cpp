@@ -370,7 +370,7 @@ const int CircularBuff::Put(Socket *const _pSocket)
       return USER_CLOSE;
     } 
 
-    CNPLog::GetInstance().Log("readn=(%d)", readn);
+    CNPLog::GetInstance().Log("readn=(%d), (%s)", readn, readbuf);
     memcpy(buf_in, readbuf, readn); 
   } 
   CNPLog::GetInstance().Log("buf_in=(%s)", buf_in);
@@ -379,7 +379,8 @@ const int CircularBuff::Put(Socket *const _pSocket)
   {
     if (m_iHead == 0)
     {
-      memcpy((void *)m_pchBufferHeader[m_iTail], buf_in, sizen); 
+      iFree = m_iBufferSize - m_iTail;
+      memcpy((void *)&m_pchBufferHeader[m_iTail], buf_in, sizen); 
     }
     else
     {
@@ -390,17 +391,21 @@ const int CircularBuff::Put(Socket *const _pSocket)
                                       iFree, sizen, m_iHead, m_iTail);
         return USER_CLOSE;
       }
+
+      if (sizen <= iFree)
+      {
+        memcpy(&m_pchBufferHeader[m_iTail], _pchBuffer, sizen);
+      }
       else
       {
-        memcpy((void *)m_pchBufferHeader[m_iTail], buf_in, iFree); 
-        memcpy((void *)m_pchBufferHeader, buf_in, sizen - iFree); 
-        // iReadLen += iTmp;
+        memcpy((void *)&m_pchBufferHeader[m_iTail], buf_in, iFree); 
+        memcpy((void *)&m_pchBufferHeader, buf_in, sizen - iFree); 
       }
     }
   }
   else
   {
-    memcpy((void *)m_pchBufferHeader[m_iTail], buf_in, sizen); 
+    memcpy((void *)&m_pchBufferHeader[m_iTail], buf_in, sizen); 
   }
 
   m_iTail += sizen;
