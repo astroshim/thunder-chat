@@ -349,8 +349,8 @@ const int CircularBuff::Put(Socket *const _pSocket)
 
   int readn;
   int sizen = 0; 
-  char buf_in[102400] = { '\0' }; 
-  char readbuf[1024] = { '\0' }; 
+  char buf_in[102400] = {'\0'}; 
+  char readbuf[1024] = {'\0'}; 
   while(1) { 
     readn = read (_pSocket->GetFd(), readbuf, 1024); 
     if (readn < 0 ) { 
@@ -376,7 +376,7 @@ const int CircularBuff::Put(Socket *const _pSocket)
   {
     if (m_iHead == 0)
     {
-      memcpy((void *)&m_pchBufferHeader[m_iTail], readbuf, sizen); 
+      memcpy((void *)&m_pchBufferHeader[m_iTail], buf_in, sizen); 
     }
     else
     {
@@ -389,15 +389,15 @@ const int CircularBuff::Put(Socket *const _pSocket)
       }
       else
       {
-        memcpy((void *)&m_pchBufferHeader[m_iTail], readbuf, iFree); 
-        memcpy((void *)&m_pchBufferHeader, readbuf, sizen - iFree); 
+        memcpy((void *)&m_pchBufferHeader[m_iTail], buf_in, iFree); 
+        memcpy((void *)&m_pchBufferHeader, buf_in, sizen - iFree); 
         // iReadLen += iTmp;
       }
     }
   }
   else
   {
-    memcpy((void *)&m_pchBufferHeader[m_iTail], readbuf, sizen); 
+    memcpy((void *)&m_pchBufferHeader[m_iTail], buf_in, sizen); 
   }
 
   m_iTail += sizen;
