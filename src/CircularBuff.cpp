@@ -373,14 +373,14 @@ const int CircularBuff::Put(Socket *const _pSocket)
       } 
       return USER_CLOSE;
     } 
-    sizen += readn; 
     if (sizen >= 102400) { 
       CNPLog::GetInstance().Log("size is big!!!!!!!! sizen=(%d)", sizen);
       return USER_CLOSE;
     } 
 
     CNPLog::GetInstance().Log("readn=(%d)", readn);
-    memcpy(buf_in, readbuf, readn); 
+    memcpy(buf_in+sizen, readbuf, readn); 
+    sizen += readn; 
   } 
 
   if (sizen == 0) {
