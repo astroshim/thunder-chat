@@ -371,7 +371,6 @@ const int CircularBuff::Put(Socket *const _pSocket)
         CNPLog::GetInstance().Log("EAGAIN!!!!!!!! sizen=(%d)", sizen);
         break; 
       } 
-
       return USER_CLOSE;
     } 
     sizen += readn; 
@@ -383,6 +382,10 @@ const int CircularBuff::Put(Socket *const _pSocket)
     CNPLog::GetInstance().Log("readn=(%d)", readn);
     memcpy(buf_in, readbuf, readn); 
   } 
+
+  if (sizen == 0) {
+    return USER_CLOSE;
+  }
 
   return Put(buf_in, sizen);
 
