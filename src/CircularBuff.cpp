@@ -349,7 +349,7 @@ const int CircularBuff::Put(Socket *const _pSocket)
 
   int readn;
   int sizen = 0; 
-  char buf_in[1024] = {'\0'}; 
+  char buf_in[102400] = {'\0'}; 
   char readbuf[256] = {'\0'}; 
 
   memset(buf_in, 0x00, sizeof(buf_in));
@@ -365,15 +365,14 @@ const int CircularBuff::Put(Socket *const _pSocket)
       return USER_CLOSE;
     } 
     sizen += readn; 
-    if (sizen >= 1024) { 
+    if (sizen >= 102400) { 
       CNPLog::GetInstance().Log("size is big!!!!!!!! sizen=(%d)", sizen);
       return USER_CLOSE;
     } 
 
-    CNPLog::GetInstance().Log("readn=(%d), (%s)", readn, readbuf);
+    CNPLog::GetInstance().Log("readn=(%d)", readn);
     memcpy(buf_in, readbuf, readn); 
   } 
-  CNPLog::GetInstance().Log("buf_in=(%s)", buf_in);
 
   if (m_iHead <= m_iTail)
   {
@@ -394,7 +393,7 @@ const int CircularBuff::Put(Socket *const _pSocket)
 
       if (sizen <= iFree)
       {
-        memcpy(&m_pchBufferHeader[m_iTail], buf_in, sizen);
+        memcpy(&m_pchBufferHeader[m_iTail], _pchBuffer, sizen);
       }
       else
       {
