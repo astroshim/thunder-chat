@@ -140,6 +140,8 @@ const int CircularBuff::Put(const char *const _pchBuffer, const int _iLength)
 
   int iFree = 0;
 
+  CNPLog::GetInstance().Log("CircularBuff::PUT 1. Head(%d),Tail(%d), lenth=(%d)", m_iHead, m_iTail, _iLength);
+
   if (m_iHead <= m_iTail + _iLength)
   {
     if (m_iHead == 0)
@@ -151,12 +153,16 @@ const int CircularBuff::Put(const char *const _pchBuffer, const int _iLength)
     {
       iFree = m_iBufferSize - m_iTail;
 
+      CNPLog::GetInstance().Log("CircularBuff::PUT 2. Head(%d),Tail(%d), lenth=(%d), free=(%d)", m_iHead, m_iTail, _iLength, iFree);
+
       if (_iLength <= iFree)
       {
         memcpy(&m_pchBufferHeader[m_iTail], _pchBuffer, _iLength);
       }
       else
       {
+        CNPLog::GetInstance().Log("CircularBuff::PUT 3. Head(%d),Tail(%d), lenth=(%d), free=(%d)", m_iHead, m_iTail, _iLength, iFree);
+
         memcpy(&m_pchBufferHeader[m_iTail], _pchBuffer, iFree);
         memcpy(m_pchBufferHeader, &_pchBuffer[iFree], _iLength - iFree);
       }
@@ -164,6 +170,7 @@ const int CircularBuff::Put(const char *const _pchBuffer, const int _iLength)
   }
   else
   {
+    CNPLog::GetInstance().Log("CircularBuff::PUT 4. Head(%d),Tail(%d), lenth=(%d), free=(%d)", m_iHead, m_iTail, _iLength, iFree);
     memcpy(&m_pchBufferHeader[m_iTail], _pchBuffer, _iLength);
   }
 
