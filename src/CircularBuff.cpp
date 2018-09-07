@@ -398,7 +398,7 @@ const int CircularBuff::Put(Socket *const _pSocket)
       else
       {
         memcpy((void *)&m_pchBufferHeader[m_iTail], buf_in, iFree); 
-        memcpy((void *)&m_pchBufferHeader, buf_in, sizen - iFree); 
+        memcpy((void *)&m_pchBufferHeader, buf_in+iFree, sizen - iFree); 
       }
     }
   }
