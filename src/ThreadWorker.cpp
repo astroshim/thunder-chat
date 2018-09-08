@@ -86,7 +86,7 @@ void ThreadWorker::Run()
     // EPOLLONESHOT 일 경우는 user level 단에서 감시하도록 시켜야 함.
     m_chatManager->UpdateEPoll(pClient, EPOLLIN | EPOLLET | EPOLLONESHOT);
     #else
-    // m_chatManager->AddEPoll(pClient, EPOLLIN | EPOLLET);
+    m_chatManager->AddEPoll(pClient, EPOLLIN | EPOLLET);
     #endif
 
 #endif
