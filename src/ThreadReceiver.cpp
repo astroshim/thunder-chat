@@ -114,7 +114,7 @@ void ThreadReceiver::Run()
     // EPOLLONESHOT 일 경우는 user level 단에서 감시하도록 시켜야 함.
     m_pChatServer->UpdateEPoll(pClient, flags);
     #else
-    m_pChatServer->AddEPoll(pClient, flags);
+    // m_pChatServer->AddEPoll(pClient, flags);
     #endif
 #endif
   }

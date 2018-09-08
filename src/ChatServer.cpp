@@ -619,8 +619,8 @@ void ChatServer::Run()
   #endif
 
   #ifndef _USE_ONESHOT
-          // 감시에서 제외 시킴.
-        m_pIOMP->DelClient(pClient);
+        // 감시에서 제외 시킴.
+        // m_pIOMP->DelClient(pClient);
   #endif
         pClient->SetAccessTime();
         PutReceiveQueue(pClient);
