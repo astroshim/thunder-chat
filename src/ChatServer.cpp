@@ -313,33 +313,38 @@ void ChatServer::AcceptClient(Socket* const _pClientSocket, ENUM_CLIENT_TYPE typ
       pNewClient->GetSocket()->GetFd(),
       type);
 
+
+#ifdef _FREEBSD
   unsigned short flags = 0;
-
-#ifdef _FREEBSD
   flags = EV_ADD|EV_ENABLE|EV_ONESHOT|EV_ERROR;
-#endif
 
-#ifdef _USE_LT
-  flags = EPOLLIN;
-#endif
-
-#ifdef _USE_ET
-  flags = EPOLLIN|EPOLLET;
-#endif
-
-#ifdef _USE_ONESHOT
-  flags |= EPOLLONESHOT;
-#endif
-
-#ifdef _FREEBSD
   if(m_pIOMP->AddClient(pNewClient, EVFILT_READ, flags) < 0)
-#else
-  if(m_pIOMP->AddClient(pNewClient, flags) < 0)
-#endif
   {
     CloseClient(pNewClient);
     return;
   }
+
+#else
+  unsigned int flags = 0;
+
+  #ifdef _USE_LT
+  flags = EPOLLIN;
+  #endif
+
+  #ifdef _USE_ET
+  flags = EPOLLIN|EPOLLET;
+  #endif
+
+  #ifdef _USE_ONESHOT
+  flags |= EPOLLONESHOT;
+  #endif
+
+  if(m_pIOMP->AddClient(pNewClient, flags) < 0)
+  {
+    CloseClient(pNewClient);
+    return;
+  }
+#endif
 }
 
 void ChatServer::CloseClient(Client* const _pClient)

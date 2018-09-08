@@ -89,32 +89,27 @@ void ThreadReceiver::Run()
 #endif
     }
 
+#ifdef _FREEBSD
     unsigned short flags = 0;
-#ifdef _FREEBSD
     flags = EV_ADD|EV_ENABLE|EV_ONESHOT|EV_ERROR;
-#endif
-
-#ifdef _USE_LT
-    flags = EPOLLIN;
-#endif
-
-#ifdef _USE_ET
-    flags = EPOLLIN|EPOLLET;
-#endif
-
-#ifdef _USE_ONESHOT
-    flags |= EPOLLONESHOT;
-#endif
-
-
-#ifdef _FREEBSD
     m_pChatServer->AddEPoll(pClient, EVFILT_READ, flags);
 #else
+    unsigned int flags = 0;
+
+    #ifdef _USE_LT
+    flags = EPOLLIN;
+    m_pChatServer->AddEPoll(pClient, flags);
+    #endif
+
+    #ifdef _USE_ET
+    flags = EPOLLIN|EPOLLET;
+    #endif
+
     #ifdef _USE_ONESHOT
+    flags |= EPOLLONESHOT;
+
     // EPOLLONESHOT 일 경우는 user level 단에서 감시하도록 시켜야 함.
     m_pChatServer->UpdateEPoll(pClient, flags);
-    #else
-    // m_pChatServer->AddEPoll(pClient, flags);
     #endif
 #endif
   }
