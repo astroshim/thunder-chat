@@ -64,8 +64,6 @@ void ThreadReceiver::Run()
 
       // Edge trigger 일때는 EAGAIN 까지 읽어야 한다.
 
-
-
       // if (pClient->IsValidPacket() > 0)
       while ((bufferedPacketSize = pClient->IsValidPacket()) > 0)
       {
